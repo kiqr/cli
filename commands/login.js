@@ -19,7 +19,7 @@ var auth0 = new AuthenticationClient({
   scope: 'offline_access'
 })
 
-const login = async(options) => {
+const loginCommand = async(options) => {
   const conf = new Configstore('kiqr-cli');
 
   print(`If you don\'t have an account, please sign up first at ${chalk.blue('https://kiqr.cloud')}`)
@@ -61,17 +61,16 @@ const login = async(options) => {
     },
     function (error, token) {
       if (error) {
-        spinner.error({ text: 'Invalid email or password', mark: chalkStderr.red.bold('✗') })
-        print(error)
-      } 
-      else if (token) {
-        // Successfully logged in.
-        spinner.success({ text: 'Successfully logged in!', mark: chalk.green.bold('✓') })
-        print(`You can confirm that you're logged in to ${chalk.bold('kiqr.cloud')} by running the command ${chalk.bold('kiqr me')} in the console.`)
-        conf.set('token', token.access_token)
+        spinner.error({ text: 'Invalid email and/or password', mark: chalkStderr.red.bold('✗') })
+        return
       }
+
+      // Successfully logged in.
+      spinner.success({ text: 'Successfully logged in!', mark: chalk.green.bold('✓') })
+      print(`You can confirm that you're logged in to ${chalk.bold('kiqr.cloud')} by running the command ${chalk.bold('kiqr info')} in the console.`)
+      conf.set('token', token.access_token)
     }
   );
 }
 
-export default login
+export default loginCommand

@@ -2,8 +2,9 @@
 
 import { Command } from 'commander'
 
-import login from './commands/login.js'
-import me from './commands/me.js'
+import loginCommand from './commands/login.js'
+import logoutCommand from './commands/logout.js'
+import infoCommand from './commands/info.js'
 
 const program = new Command();
 
@@ -14,10 +15,14 @@ program
 
 program.command('login')
   .description('Login to your user account')
-  .action(login);
+  .action(loginCommand);
 
-program.command('me')
-  .description('View information about the current signed in user.')
-  .action(me);
+program.command('logout')
+  .description('Logout from user account')
+  .action(logoutCommand);
+
+program.command('info')
+  .description('Get current user and project configuration')
+  .action(infoCommand)
 
 program.parse();

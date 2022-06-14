@@ -8,28 +8,44 @@ This is the command line application for [KIQR Headless CMS](https://kiqr.dev).
 Install the cli application globally by running:
 
 ```console
-$ npm install -g @kiqr/cli
+npm install -g @kiqr/cli
 ```
 
 and run `kiqr --version` from your terminal to confirm that it has been successfully installed.
 
 
-Getting started
----------------
+Authentication
+--------------
 
-### Authentication
-
-You can authenticate by signing in with your **kiqr.cloud** credentials:
+Most of the kiqr commands requires you to be signed in to your [kiqr.cloud](https://kiqr.cloud) user account. You can authenticate by signing in with your user credentials directly in the console:
 
 ```console
 $ kiqr login
+| If you don't have an account, please sign up first at https://kiqr.cloud
+| Enter your kiqr.cloud credentials to login:
+? Username (email): 
 ```
 
 Confirm that you're actually logged in:
 
 ```console
-$ kiqr me
+$ kiqr info
+✓ Current user:
+| id: 3743695092861631051
+| name: David Specimen
+| email: david.specimen@companyemail.com
+| created_at: 2022-06-12 22:25:18
 ```
+
+Getting started
+---------------
+
+You can initialize a new project by running `kiqr setup` in your projects root directory:
+
+```console
+$ kiqr setup [project_id]
+```
+Replace `[project_id]` with a project id. The
 
 ## License
 The application is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
