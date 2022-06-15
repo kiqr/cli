@@ -23,19 +23,23 @@ const displayUserProfile = async(options) => {
 }
 
 const displayProjectConfiguration = async(options) => {
-  const { filePath, config, foundConfig } = await kiqrConfig();
-
-  if (!foundConfig) {
-    return
+  const { filePath, config, hasConfig } = await kiqrConfig();
+  const spinner = createSpinner('Searching for kiqr.json').start()
+  if (hasConfig) {
+    spinner.success({ text: 'Project config:', mark: chalk.green.bold('✓') })
+    print(chalk.bold('apiVersion') + ': ' + config.get('apiVersion'))
+    print(chalk.bold('projectId') + ': ' + config.get('projectId'))
+    print(chalk.bold('Config file') + ': ' + filePath)
+  } else {
+    spinner.error({ text: `Couldn't find a KIQR config file in the current directory.`, mark: chalkStderr.red.bold('✗') })
+    print(`Run ${chalk.bold('kiqr setup [PROJECT_ID]')} from your projects root directory to initialize a project.`)
+    print(`If you don't have a project yet, open https://kiqr.cloud in a web browser and follow the instructions there.`)
+    print(`Alternatively, you can run ${chalk.bold('kiqr projects')} from the command line to see a list of all your available PROJECT_IDs.`)
   }
-
-  print(chalk.bold('Project ID') + ': ' + config.projectId)
-  print(chalk.bold('Api version') + ': ' + config.projectId)
 }
 
 const infoCommand = async(options) => {
   await displayUserProfile();
-  console.log('')
   await displayProjectConfiguration();
 }
 

@@ -23,7 +23,9 @@ Most of the kiqr commands requires you to be signed in to your [kiqr.cloud](http
 $ kiqr login
 | If you don't have an account, please sign up first at https://kiqr.cloud
 | Enter your kiqr.cloud credentials to login:
-? Username (email): 
+? Username (email): david.specimen@companyemail.com
+? Password: ********
+✓ Successfully logged in!
 ```
 
 Confirm that you're actually logged in:
@@ -43,9 +45,9 @@ Getting started
 You can initialize a new project by running `kiqr setup` in your projects root directory:
 
 ```console
-$ kiqr setup [project_id]
+$ kiqr setup <project_id>
 ```
-Replace `[project_id]` with a project id. The
+Replace `<project_id>` with a project id. The
 
 ## License
 The application is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

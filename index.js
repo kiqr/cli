@@ -5,6 +5,7 @@ import { Command } from 'commander'
 import loginCommand from './commands/login.js'
 import logoutCommand from './commands/logout.js'
 import infoCommand from './commands/info.js'
+import setupCommand from './commands/setup.js'
 
 const program = new Command();
 
@@ -24,5 +25,11 @@ program.command('logout')
 program.command('info')
   .description('Get current user and project configuration')
   .action(infoCommand)
+
+program.command('setup')
+  .description('Initialize KIQR in the current directory')
+  .argument('<project_id>', 'Project ID')
+  .action(setupCommand)
+
 
 program.parse();

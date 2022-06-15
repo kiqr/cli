@@ -23,6 +23,7 @@
     "configstore": "^6.0.0",
     "inquirer": "^8.2.4",
     "nanospinner": "^1.1.0",
+    "nconf": "^0.12.0",
     "node-fetch": "^3.2.6"
   }
 }
