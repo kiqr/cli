@@ -67,7 +67,7 @@ const loginCommand = async(options) => {
 
       // Successfully logged in.
       spinner.success({ text: 'Successfully logged in!', mark: chalk.green.bold('✓') })
-      print(`You can confirm that you're logged in to ${chalk.bold('kiqr.cloud')} by running the command ${chalk.bold('kiqr info')} in the console.`)
+      print(`You can confirm that you're logged in to ${chalk.bold('kiqr.cloud')} by running the command ${chalk.bold('kiqr me')} in the console.`)
       conf.set('token', token.access_token)
     }
   );

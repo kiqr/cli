@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander'
-
-import loginCommand from './commands/login.js'
-import logoutCommand from './commands/logout.js'
-import infoCommand from './commands/info.js'
-import setupCommand from './commands/setup.js'
+import {
+  loginCommand,
+  logoutCommand,
+  setupCommand,
+  statusCommand,
+  meCommand 
+} from './commands/index.js'
 
 const program = new Command();
 
@@ -22,14 +24,17 @@ program.command('logout')
   .description('Logout from user account')
   .action(logoutCommand);
 
-program.command('info')
-  .description('Get current user and project configuration')
-  .action(infoCommand)
+program.command('me')
+  .description('Get current signed in user')
+  .action(meCommand)
 
 program.command('setup')
-  .description('Initialize KIQR in the current directory')
-  .argument('<project_id>', 'Project ID')
+  .description('Initialize a project locally')
+  .argument('project_id', 'The project ID')
   .action(setupCommand)
 
+program.command('status')
+  .description('Get current project status')
+  .action(statusCommand)
 
 program.parse();

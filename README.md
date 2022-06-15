@@ -28,30 +28,47 @@ $ kiqr login
 ✓ Successfully logged in!
 ```
 
-Confirm that you're actually logged in:
+### Get the current signed in user:
+
+You can get the current signed in user by running `kiqr me`:
 
 ```console
-$ kiqr info
-✓ Current user:
-| id: 3743695092861631051
-| name: David Specimen
-| email: david.specimen@companyemail.com
-| created_at: 2022-06-12 22:25:18
+$ kiqr me
+✓ You are signed in as David Specimen:
+| id: 1
+| Email: david.specimen@companyemail.com
+| Avatar: https://avatars.dicebear.com/api/initials/David+Specimen.svg
+| Created at: 2022-06-14 19:49:19
+| Run kiqr logout to logout.
 ```
 
 Getting started
 ---------------
 
-You can initialize a new project by running `kiqr setup` in your projects root directory:
+Start by creating a project at [kiqr.cloud](https://kiqr.cloud) and make sure you have the `PROJECT_ID` in hand. You can then initialize the project locally by running `kiqr setup`. We recommend installing KIQR at the root of your frontend repository.
 
 ```console
 $ kiqr setup <project_id>
-✓ All checks ok.
 ✓ Your project was successfully setup!
-| A configuration file was created at: /Users/david/code/my-project/kiqr.json
-| Run kiqr info to view your projects configuration.
+| A configuration file was created at: /Users/david/code/my-frontend-project/kiqr.json
+| Run kiqr config to view your projects configuration.
 ```
-Replace `<project_id>` with a project id. The
+Replace `<project_id>` in the example above with your projects `project_id`.
+
+### Check connection & configuration status
+
+You can check that your project has been successfully setup by running the command `kiqr status`. This will check the following:
+
+- That you can connect to kiqr.cloud.
+- That you have a project configured with a valid project id.
+- That the project is accessible by the current user.
+
+```console
+$ kiqr status
+✓ You are signed in as David Specimen.
+✓ Configuration file found at: /Users/david/code/my-frontend-project/kiqr.json.
+✓ Connected to project: Example Project. Everything's ok!
+```
 
 ## License
 The application is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
