@@ -38,9 +38,25 @@ const displayProjectConfiguration = async(options) => {
   }
 }
 
+const displayProjectConnectionStatus = async(options) => {
+  // Skip if no config file is found.
+  const { config, hasConfig } = await kiqrConfig();
+  if (!hasConfig) { return }
+
+  const spinner = createSpinner('Checking project status').start()
+  try {
+    const project = await request('/v1/projects/' + config.get('projectId'));
+    spinner.success({ text: 'Connected to project. Everything\'s ok!', mark: chalkStderr.green.bold('✓') })
+  } catch (error) {
+    spinner.error({ text: 'Could not connect to project', mark: chalkStderr.red.bold('✗') })
+    print(`Make sure that have an active internet connection and that you're logged in to a user that has access to this project.`)
+  }
+}
+
 const infoCommand = async(options) => {
   await displayUserProfile();
   await displayProjectConfiguration();
+  await displayProjectConnectionStatus();
 }
 
 export default infoCommand
