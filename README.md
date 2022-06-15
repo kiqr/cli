@@ -46,6 +46,10 @@ You can initialize a new project by running `kiqr setup` in your projects root d
 
 ```console
 $ kiqr setup <project_id>
+✓ All checks ok.
+✓ Your project was successfully setup!
+| A configuration file was created at: /Users/david/code/my-project/kiqr.json
+| Run kiqr info to view your projects configuration.
 ```
 Replace `<project_id>` with a project id. The
 
