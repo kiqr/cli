@@ -1,0 +1,26 @@
+{
+  "properties": {
+    "name": { "type": "string" },
+    "kind": { "enum": ["collection", "single"]},
+    "schema": { 
+      "values": { "ref": "field" } 
+    }
+  },
+  "definitions": {
+    "field": {
+      "discriminator": "type",
+      "mapping": {
+        "string": {
+          "optionalProperties": {
+            "label": { "type": "string" }
+          }
+        },
+        "editor": {
+          "optionalProperties": {
+            "label": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
