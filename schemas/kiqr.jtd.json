@@ -1,0 +1,16 @@
+{
+  "properties": {
+    "_id": { "type": "string" },
+    "name": { "type": "string" },
+    "remote": { 
+      "properties": {
+        "origin": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "int32"
+        }
+      }
+    }
+  }
+}

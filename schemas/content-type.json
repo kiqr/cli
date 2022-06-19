@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": [ 
+    "name",
+    "kind",
+    "schema"
+  ],
+  "properties": {
+    "name": { "type": "string" },
+    "kind": { "enum": ["collection", "single"]},
+    "schema": { 
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": { 
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "label": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
