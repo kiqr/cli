@@ -1,0 +1,6 @@
+{
+  "properties": {
+    "id": { "type": "string" },
+    "version": { "type": "int32" }
+  }
+}
