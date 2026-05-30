@@ -1,0 +1,46 @@
+{
+  "name": "@kiqr/cli",
+  "version": "0.1.0",
+  "description": "Local WordPress theme development CLI",
+  "type": "module",
+  "bin": {
+    "kiqr": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "wordpress",
+    "theme",
+    "cli",
+    "docker",
+    "development"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@inkjs/ui": "^2.0.0",
+    "ink": "^7.0.5",
+    "pastel": "^4.0.1",
+    "react": "^19.2.6",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@sindresorhus/tsconfig": "^8.1.0",
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.2.15",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  }
+}
