@@ -5,6 +5,7 @@ import type {Step} from '../components/StepRunner.js';
 import {runDockerCompose} from '../lib/docker.js';
 import {readProjectConfig} from '../lib/config.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
+import {stopTraefikIfIdle} from '../lib/traefik.js';
 import path from 'node:path';
 import fs from 'node:fs';
 import type {ProjectConfig} from '../types/config.js';
@@ -56,6 +57,12 @@ export default function Destroy() {
         if (fs.existsSync(kiqrYaml)) {
           fs.unlinkSync(kiqrYaml);
         }
+      },
+    },
+    {
+      label: 'Cleaning up...',
+      run: async () => {
+        stopTraefikIfIdle();
       },
     },
   ];

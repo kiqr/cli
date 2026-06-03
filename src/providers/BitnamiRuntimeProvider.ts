@@ -57,6 +57,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
           `traefik.http.routers.${config.projectSlug}-wp.entrypoints=web`,
           `traefik.http.services.${config.projectSlug}-wp.loadbalancer.server.port=80`,
         ],
+        extra_hosts: [`${config.hostname}:host-gateway`],
         networks: [KIQR_NETWORK, 'default'],
         depends_on: ['mariadb'],
         restart: 'unless-stopped',

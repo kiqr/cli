@@ -5,6 +5,7 @@ import type {Step} from '../components/StepRunner.js';
 import {runDockerCompose} from '../lib/docker.js';
 import {readProjectConfig} from '../lib/config.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
+import {stopTraefikIfIdle} from '../lib/traefik.js';
 import path from 'node:path';
 import type {ProjectConfig} from '../types/config.js';
 
@@ -30,11 +31,17 @@ export default function Down() {
       },
     },
     {
-      label: 'Stopping WordPress and database...',
+      label: 'Stopping site...',
       run: async () => {
         const runtimeDir = getProjectRuntimeDir(ref.current.projectConfig!.project_id);
         const composePath = path.join(runtimeDir, 'compose.yaml');
         runDockerCompose(composePath, 'down');
+      },
+    },
+    {
+      label: 'Cleaning up...',
+      run: async () => {
+        stopTraefikIfIdle();
       },
     },
   ];

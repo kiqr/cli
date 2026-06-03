@@ -1,5 +1,5 @@
 {
-  "name": "@kiqr/cli",
+  "name": "kiqr",
   "version": "0.1.0",
   "description": "Local WordPress theme development CLI",
   "type": "module",

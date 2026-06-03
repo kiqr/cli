@@ -5,6 +5,7 @@ export interface ComposeService {
   labels?: string[];
   networks?: string[];
   depends_on?: string[];
+  extra_hosts?: string[];
   restart?: string;
 }
 
