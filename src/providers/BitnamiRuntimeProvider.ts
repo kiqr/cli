@@ -48,6 +48,8 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
           `wordpress_data:/var/www/html`,
           `${config.themePath}:${this.getThemeMountTarget(config.themeSlug)}`,
           `${config.muPluginPath}:/var/www/html/wp-content/mu-plugins/kiqr-auto-login.php:ro`,
+          `${config.pluginsPath}:/var/www/html/wp-content/plugins`,
+          `${config.uploadsPath}:/var/www/html/wp-content/uploads`,
         ],
         labels: [
           'traefik.enable=true',

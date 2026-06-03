@@ -17,6 +17,8 @@ export interface RuntimeConfig {
   dbPassword: string;
   loginSecret: string;
   muPluginPath: string;
+  pluginsPath: string;
+  uploadsPath: string;
   dataDir: string;
 }
 

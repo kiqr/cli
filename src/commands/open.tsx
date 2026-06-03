@@ -4,10 +4,10 @@ import {execSync} from 'node:child_process';
 import zod from 'zod';
 import {argument} from 'pastel';
 import {readProjectConfig, readLocalConfig} from '../lib/config.js';
-import {getProjectRuntimeDir} from '../lib/paths.js';
+import {getProjectRuntimeDir, getProjectPluginsDir, getProjectUploadsDir} from '../lib/paths.js';
 import {buildProjectHostname} from '../lib/hostname.js';
 
-export const description = 'Open a site URL in your browser';
+export const description = 'Open a site URL or folder in your browser/explorer';
 
 export const args = zod.tuple([
   zod.string().optional().describe(
@@ -17,7 +17,10 @@ export const args = zod.tuple([
         'What to open (default: wp)\n\n' +
         '  wp, wordpress, web        Open the site\n' +
         '  admin, wpadmin, dashboard  Open the WordPress dashboard (auto-login)\n' +
-        '  phpmyadmin, pma            Open phpMyAdmin (auto-login)',
+        '  phpmyadmin, pma            Open phpMyAdmin (auto-login)\n' +
+        '  plugins                    Open the plugins folder\n' +
+        '  uploads, media             Open the uploads folder\n' +
+        '  wp-content, content        Open the wp-content folder (runtime dir)',
     }),
   ),
 ]);
@@ -35,7 +38,23 @@ const ALIASES: Record<string, string> = {
   admin: 'admin',
   wpadmin: 'admin',
   dashboard: 'admin',
+  plugins: 'plugins',
+  uploads: 'uploads',
+  media: 'uploads',
+  'wp-content': 'wp-content',
+  content: 'wp-content',
 };
+
+function openTarget(target: string): void {
+  const openCmd =
+    process.platform === 'darwin'
+      ? 'open'
+      : process.platform === 'win32'
+        ? 'start'
+        : 'xdg-open';
+
+  execSync(`${openCmd} "${target}"`, {stdio: 'pipe'});
+}
 
 export default function Open({args}: Props) {
   const {exit} = useApp();
@@ -52,7 +71,7 @@ export default function Open({args}: Props) {
     const key = ALIASES[(appArg ?? 'wp').toLowerCase()];
     if (!key) {
       console.error(
-        `Unknown app "${appArg}". Available: wp, phpmyadmin, admin`,
+        `Unknown target "${appArg}". Run "kiqr open --help" to see available targets.`,
       );
       exit(new Error());
       return;
@@ -63,36 +82,33 @@ export default function Open({args}: Props) {
     const hostname = buildProjectHostname(pc.name);
     const phpMyAdminHostname = buildProjectHostname(pc.name, 'phpmyadmin');
 
-    let url: string;
-    switch (key) {
-      case 'wp':
-        url = `http://${hostname}:5477`;
-        break;
-      case 'phpmyadmin':
-        url = `http://${phpMyAdminHostname}:5477`;
-        break;
-      case 'admin':
-        if (lc?.login_secret) {
-          url = `http://${hostname}:5477/wp-admin?kiqr_login=${lc.login_secret}`;
-        } else {
-          url = `http://${hostname}:5477/wp-admin`;
-        }
-        break;
-      default:
-        url = `http://${hostname}:5477`;
-    }
-
-    const openCmd =
-      process.platform === 'darwin'
-        ? 'open'
-        : process.platform === 'win32'
-          ? 'start'
-          : 'xdg-open';
-
     try {
-      execSync(`${openCmd} "${url}"`, {stdio: 'pipe'});
+      switch (key) {
+        case 'wp':
+          openTarget(`http://${hostname}:5477`);
+          break;
+        case 'phpmyadmin':
+          openTarget(`http://${phpMyAdminHostname}:5477`);
+          break;
+        case 'admin':
+          if (lc?.login_secret) {
+            openTarget(`http://${hostname}:5477/wp-admin?kiqr_login=${lc.login_secret}`);
+          } else {
+            openTarget(`http://${hostname}:5477/wp-admin`);
+          }
+          break;
+        case 'plugins':
+          openTarget(getProjectPluginsDir(pc.project_id));
+          break;
+        case 'uploads':
+          openTarget(getProjectUploadsDir(pc.project_id));
+          break;
+        case 'wp-content':
+          openTarget(runtimeDir);
+          break;
+      }
     } catch {
-      console.error(`Could not open browser. Visit: ${url}`);
+      console.error('Could not open target. Is the site running?');
     }
 
     exit();
@@ -100,7 +116,7 @@ export default function Open({args}: Props) {
 
   return (
     <Box>
-      <Text dimColor>Opening browser...</Text>
+      <Text dimColor>Opening...</Text>
     </Box>
   );
 }

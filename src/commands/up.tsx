@@ -12,12 +12,13 @@ import {
   writeLocalConfig,
   projectConfigExists,
 } from '../lib/config.js';
-import {getProjectRuntimeDir} from '../lib/paths.js';
+import {getProjectRuntimeDir, getProjectPluginsDir, getProjectUploadsDir} from '../lib/paths.js';
 import {ensureTraefikRunning} from '../lib/traefik.js';
 import {buildProjectHostname} from '../lib/hostname.js';
 import {detectTheme} from '../lib/theme.js';
 import {writeProjectCompose} from '../lib/compose.js';
 import {writeMuPlugin} from '../lib/mu-plugin.js';
+import fs from 'node:fs';
 import path from 'node:path';
 import type {ProjectConfig, LocalConfig} from '../types/config.js';
 
@@ -146,6 +147,10 @@ export default function Up() {
         const hostname = buildProjectHostname(pc.name);
         const phpMyAdminHostname = buildProjectHostname(pc.name, 'phpmyadmin');
         const muPluginPath = writeMuPlugin(ref.current.runtimeDir);
+        const pluginsPath = getProjectPluginsDir(pc.project_id);
+        const uploadsPath = getProjectUploadsDir(pc.project_id);
+        fs.mkdirSync(pluginsPath, {recursive: true});
+        fs.mkdirSync(uploadsPath, {recursive: true});
 
         setSiteUrl(`http://${hostname}:5477`);
         setPmaUrl(`http://${phpMyAdminHostname}:5477`);
@@ -160,6 +165,8 @@ export default function Up() {
             dbPassword: lc.db_password,
             loginSecret: lc.login_secret,
             muPluginPath,
+            pluginsPath,
+            uploadsPath,
             dataDir: ref.current.runtimeDir,
           },
           ref.current.runtimeDir,
