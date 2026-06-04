@@ -1,10 +1,10 @@
 {
-  "name": "kiqr",
-  "version": "0.1.0",
+  "name": "@kiqr/cli",
+  "version": "0.1.1",
   "description": "Local WordPress theme development CLI",
   "type": "module",
   "bin": {
-    "kiqr": "./dist/cli.js"
+    "kiqr": "dist/cli.js"
   },
   "files": [
     "dist"
