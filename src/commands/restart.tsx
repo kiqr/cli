@@ -2,8 +2,8 @@ import {useState, useRef} from 'react';
 import {Box, Text, useApp} from 'ink';
 import StepRunner from '../components/StepRunner.js';
 import type {Step} from '../components/StepRunner.js';
-import {isDockerInstalled, isDockerRunning, runDockerCompose} from '../lib/docker.js';
-import {readProjectConfig, readLocalConfig} from '../lib/config.js';
+import {isDockerInstalled, isDockerRunning, runDockerCompose, removeDockerVolume} from '../lib/docker.js';
+import {readProjectConfig, readLocalConfig, writeLocalConfig} from '../lib/config.js';
 import {getProjectRuntimeDir, getProjectPluginsDir, getProjectUploadsDir} from '../lib/paths.js';
 import {ensureTraefikRunning} from '../lib/traefik.js';
 import {buildProjectHostname} from '../lib/hostname.js';
@@ -107,6 +107,7 @@ export default function Restart() {
             themeSlug: theme.slug,
             hostname,
             phpMyAdminHostname,
+            wordpressVersion: pc.wordpress.version,
             dbPassword: lc.db_password,
             loginSecret: lc.login_secret,
             muPluginPath,
@@ -125,9 +126,26 @@ export default function Restart() {
       },
     },
     {
+      label: 'Checking WordPress version...',
+      run: async () => {
+        const pc = ref.current.projectConfig!;
+        const lc = ref.current.localConfig!;
+        const requestedVersion = pc.wordpress.version;
+
+        if (lc.wordpress_version && lc.wordpress_version !== requestedVersion) {
+          removeDockerVolume(`${pc.project_id}_wordpress_data`);
+        }
+
+        if (lc.wordpress_version !== requestedVersion) {
+          lc.wordpress_version = requestedVersion;
+          writeLocalConfig(lc, ref.current.runtimeDir);
+        }
+      },
+    },
+    {
       label: 'Starting WordPress and database...',
       run: async () => {
-        runDockerCompose(ref.current.composePath, 'up', ['-d']);
+        runDockerCompose(ref.current.composePath, 'up', ['-d', '--pull', 'always']);
       },
     },
   ];

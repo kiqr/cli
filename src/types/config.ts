@@ -25,5 +25,6 @@ export interface LocalConfig {
   runtime: string;
   db_password: string;
   login_secret: string;
+  wordpress_version?: string;
   created_at: string;
 }

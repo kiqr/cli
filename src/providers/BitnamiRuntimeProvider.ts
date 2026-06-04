@@ -39,7 +39,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
 
     return {
       wordpress: {
-        image: this.getWordPressImage('latest', '8.3'),
+        image: this.getWordPressImage(config.wordpressVersion, '8.3'),
         environment: {
           ...this.getEnvironmentVariables(credentials),
           KIQR_LOGIN_SECRET: config.loginSecret,

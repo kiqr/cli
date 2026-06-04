@@ -28,6 +28,14 @@ export function runDockerCompose(
   });
 }
 
+export function removeDockerVolume(name: string): void {
+  try {
+    execSync(`docker volume rm "${name}"`, {stdio: 'pipe'});
+  } catch {
+    // Volume may not exist
+  }
+}
+
 export function isContainerRunning(name: string): boolean {
   try {
     const output = execSync(

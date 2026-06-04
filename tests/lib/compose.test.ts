@@ -10,7 +10,12 @@ describe('generateProjectCompose', () => {
     themeSlug: 'my-theme',
     hostname: 'my-theme.test.local',
     phpMyAdminHostname: 'phpmyadmin.my-theme.test.local',
+    wordpressVersion: 'latest',
     dbPassword: 'test_password',
+    loginSecret: 'secret123',
+    muPluginPath: '/tmp/mu-plugin.php',
+    pluginsPath: '/tmp/plugins',
+    uploadsPath: '/tmp/uploads',
     dataDir: '/tmp/kiqr/projects/uuid',
   };
 

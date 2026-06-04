@@ -1,5 +1,6 @@
 import {useState, useRef} from 'react';
 import {Box, Text, useApp} from 'ink';
+import {TextInput} from '@inkjs/ui';
 import StepRunner from '../components/StepRunner.js';
 import type {Step} from '../components/StepRunner.js';
 import {runDockerCompose} from '../lib/docker.js';
@@ -12,11 +13,50 @@ import type {ProjectConfig} from '../types/config.js';
 
 export const description = 'Stop and remove all site data (database, uploads, etc.)';
 
+function generateChallenge(): {a: number; b: number; answer: number} {
+  const a = Math.floor(Math.random() * 40) + 10;
+  const b = Math.floor(Math.random() * 40) + 10;
+  return {a, b, answer: a + b};
+}
+
 export default function Destroy() {
   const {exit} = useApp();
+  const [confirmed, setConfirmed] = useState(false);
+  const [wrong, setWrong] = useState(false);
   const [complete, setComplete] = useState(false);
 
-  const ref = useRef<{projectConfig: ProjectConfig | null}>({projectConfig: null});
+  const ref = useRef<{
+    projectConfig: ProjectConfig | null;
+    challenge: {a: number; b: number; answer: number};
+  }>({projectConfig: null, challenge: generateChallenge()});
+
+  const challenge = ref.current.challenge;
+
+  if (!confirmed) {
+    return (
+      <Box flexDirection="column" paddingTop={1}>
+        <Text color="red" bold>This will permanently delete all site data.</Text>
+        <Text color="red">Database, uploads, plugins, and configuration will be lost.</Text>
+        <Text> </Text>
+        <Text>To confirm, solve this: <Text bold color="yellow">What is {challenge.a} + {challenge.b}?</Text></Text>
+        <Box marginTop={1}>
+          {wrong && <Text color="red">Wrong answer. </Text>}
+          <Text dimColor>Answer: </Text>
+          <TextInput
+            onSubmit={(value) => {
+              if (parseInt(value, 10) === challenge.answer) {
+                setConfirmed(true);
+              } else {
+                setWrong(true);
+                ref.current.challenge = generateChallenge();
+                setTimeout(() => exit(new Error()), 100);
+              }
+            }}
+          />
+        </Box>
+      </Box>
+    );
+  }
 
   const steps: Step[] = [
     {

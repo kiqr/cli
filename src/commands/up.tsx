@@ -4,7 +4,7 @@ import {ConfirmInput} from '@inkjs/ui';
 import {randomUUID} from 'node:crypto';
 import StepRunner from '../components/StepRunner.js';
 import type {Step} from '../components/StepRunner.js';
-import {isDockerInstalled, isDockerRunning, runDockerCompose} from '../lib/docker.js';
+import {isDockerInstalled, isDockerRunning, runDockerCompose, removeDockerVolume} from '../lib/docker.js';
 import {
   readProjectConfig,
   readLocalConfig,
@@ -162,6 +162,7 @@ export default function Up() {
             themeSlug: theme.slug,
             hostname,
             phpMyAdminHostname,
+            wordpressVersion: pc.wordpress.version,
             dbPassword: lc.db_password,
             loginSecret: lc.login_secret,
             muPluginPath,
@@ -180,9 +181,35 @@ export default function Up() {
       },
     },
     {
+      label: 'Checking WordPress version...',
+      run: async () => {
+        const pc = ref.current.projectConfig!;
+        const lc = ref.current.localConfig!;
+        const requestedVersion = pc.wordpress.version;
+        const runningVersion = lc.wordpress_version;
+
+        if (runningVersion && runningVersion !== requestedVersion) {
+          // Stop containers so the volume is released
+          try {
+            runDockerCompose(ref.current.composePath, 'down');
+          } catch {
+            // May not be running
+          }
+          // Now safe to remove the WordPress core volume
+          removeDockerVolume(`${pc.project_id}_wordpress_data`);
+        }
+
+        // Track the version
+        if (lc.wordpress_version !== requestedVersion) {
+          lc.wordpress_version = requestedVersion;
+          writeLocalConfig(lc, ref.current.runtimeDir);
+        }
+      },
+    },
+    {
       label: 'Starting WordPress and database...',
       run: async () => {
-        runDockerCompose(ref.current.composePath, 'up', ['-d']);
+        runDockerCompose(ref.current.composePath, 'up', ['-d', '--pull', 'always']);
       },
     },
   ];

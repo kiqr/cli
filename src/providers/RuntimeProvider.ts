@@ -15,6 +15,7 @@ export interface RuntimeConfig {
   themeSlug: string;
   hostname: string;
   phpMyAdminHostname: string;
+  wordpressVersion: string;
   dbPassword: string;
   loginSecret: string;
   muPluginPath: string;
