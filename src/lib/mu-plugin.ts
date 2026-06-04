@@ -3,14 +3,33 @@ import path from 'node:path';
 
 const MU_PLUGIN_CONTENT = `<?php
 /**
- * Plugin Name: Kiqr Auto Login
- * Description: Development-only auto login via signed URL.
+ * Plugin Name: Kiqr Development
+ * Description: Auto login, theme activation, and dev helpers for Kiqr.
  */
 
 if (!defined('ABSPATH') || !defined('KIQR_DEVELOPMENT') || !KIQR_DEVELOPMENT) {
     return;
 }
 
+// Auto-activate the mounted theme on first boot
+add_action('init', function () {
+    \$slug = getenv('KIQR_THEME_SLUG');
+    if (!\$slug) return;
+
+    \$active = get_option('stylesheet');
+    if (\$active === \$slug) return;
+
+    // Only auto-activate if the theme hasn't been manually changed before
+    if (get_option('kiqr_theme_activated')) return;
+
+    \$theme = wp_get_theme(\$slug);
+    if (!\$theme->exists()) return;
+
+    switch_theme(\$slug);
+    update_option('kiqr_theme_activated', '1');
+}, 1);
+
+// Auto login via signed URL
 add_action('init', function () {
     if (empty(\$_GET['kiqr_login']) || is_user_logged_in()) {
         return;

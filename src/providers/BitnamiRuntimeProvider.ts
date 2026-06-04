@@ -43,6 +43,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         environment: {
           ...this.getEnvironmentVariables(credentials),
           KIQR_LOGIN_SECRET: config.loginSecret,
+          KIQR_THEME_SLUG: config.themeSlug,
         },
         volumes: [
           `wordpress_data:/var/www/html`,
@@ -73,6 +74,25 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         volumes: [`mariadb_data:/var/lib/mysql`],
         networks: ['default'],
         restart: 'unless-stopped',
+      },
+      wpcli: {
+        image: 'wordpress:cli',
+        environment: {
+          WORDPRESS_DB_HOST: 'mariadb',
+          WORDPRESS_DB_NAME: credentials.dbName,
+          WORDPRESS_DB_USER: credentials.dbUser,
+          WORDPRESS_DB_PASSWORD: credentials.dbPassword,
+        },
+        volumes: [
+          `wordpress_data:/var/www/html`,
+          `${config.themePath}:${this.getThemeMountTarget(config.themeSlug)}`,
+          `${config.pluginsPath}:/var/www/html/wp-content/plugins`,
+          `${config.uploadsPath}:/var/www/html/wp-content/uploads`,
+        ],
+        networks: ['default'],
+        depends_on: ['mariadb'],
+        profiles: ['cli'],
+        user: '33:33',
       },
       phpmyadmin: {
         image: 'phpmyadmin:latest',
