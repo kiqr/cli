@@ -1,5 +1,5 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest';
-import {getKiqrDataDir, getProjectRuntimeDir} from '../../src/lib/paths.js';
+import {getKiqrDataDir, getProjectRuntimeDir, getProjectBackupsDir} from '../../src/lib/paths.js';
 
 describe('getKiqrDataDir', () => {
   beforeEach(() => {
@@ -34,5 +34,21 @@ describe('getProjectRuntimeDir', () => {
     vi.stubEnv('HOME', '/Users/testuser');
     const result = getProjectRuntimeDir('abc-123', 'darwin');
     expect(result).toBe('/Users/testuser/Library/Application Support/Kiqr/projects/abc-123');
+  });
+});
+
+describe('getProjectBackupsDir', () => {
+  it('returns <runtimeDir>/backups on darwin', () => {
+    vi.stubEnv('HOME', '/Users/test');
+    expect(getProjectBackupsDir('abc-123', 'darwin')).toBe(
+      '/Users/test/Library/Application Support/Kiqr/projects/abc-123/backups',
+    );
+  });
+
+  it('returns <runtimeDir>/backups on linux', () => {
+    vi.stubEnv('HOME', '/home/test');
+    expect(getProjectBackupsDir('abc-123', 'linux')).toBe(
+      '/home/test/.config/kiqr/projects/abc-123/backups',
+    );
   });
 });
