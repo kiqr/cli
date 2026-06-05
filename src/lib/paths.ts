@@ -40,3 +40,7 @@ export function getProjectPluginsDir(projectId: string, platform: NodeJS.Platfor
 export function getProjectUploadsDir(projectId: string, platform: NodeJS.Platform = process.platform): string {
   return path.join(getProjectRuntimeDir(projectId, platform), 'uploads');
 }
+
+export function getProjectBackupsDir(projectId: string, platform: NodeJS.Platform = process.platform): string {
+  return path.join(getProjectRuntimeDir(projectId, platform), 'backups');
+}

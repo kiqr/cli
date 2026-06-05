@@ -16,6 +16,7 @@ export default function Index() {
       <Text>  <Text bold>kiqr info</Text>      Show project info and credentials</Text>
       <Text>  <Text bold>kiqr open</Text>      Open site, admin, or phpMyAdmin in browser</Text>
       <Text>  <Text bold>kiqr wp</Text>        Run a WP-CLI command</Text>
+      <Text>  <Text bold>kiqr db</Text>        Backup and restore the database</Text>
       <Text>  <Text bold>kiqr logs</Text>      Show WordPress logs</Text>
       <Text>  <Text bold>kiqr destroy</Text>   Remove all site data and start fresh</Text>
       <Text> </Text>
