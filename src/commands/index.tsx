@@ -13,6 +13,7 @@ export default function Index() {
       <Text>  <Text bold>kiqr up</Text>        Start the development environment</Text>
       <Text>  <Text bold>kiqr down</Text>      Stop the development environment</Text>
       <Text>  <Text bold>kiqr restart</Text>   Restart the development environment</Text>
+      <Text>  <Text bold>kiqr watch</Text>     Watch files and auto-reload browser</Text>
       <Text>  <Text bold>kiqr info</Text>      Show project info and credentials</Text>
       <Text>  <Text bold>kiqr open</Text>      Open site, admin, or phpMyAdmin in browser</Text>
       <Text>  <Text bold>kiqr wp</Text>        Run a WP-CLI command</Text>
