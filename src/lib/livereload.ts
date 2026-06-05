@@ -60,7 +60,9 @@ export class LiveReloadServer {
 
   constructor(options: LiveReloadOptions = {}) {
     this.port = options.port ?? 35729;
-    this.host = options.host ?? 'localhost';
+    // Bind to all interfaces so IPv4 clients (e.g. lvh.me → 127.0.0.1) can reach the server.
+    // 'localhost' resolves to ::1 first on macOS/Node 20+, leaving an IPv6-only socket.
+    this.host = options.host ?? '0.0.0.0';
   }
 
   start(): Promise<void> {
