@@ -55,6 +55,13 @@ add_action('init', function () {
     wp_safe_redirect(\$redirect ?: admin_url());
     exit;
 });
+
+// Inject LiveReload script in development
+add_action('wp_footer', function () {
+    \$lr_port = getenv('KIQR_LIVERELOAD_PORT');
+    if (!\$lr_port) \$lr_port = '35729';
+    echo '<script src="http://localhost:' . esc_attr(\$lr_port) . '/livereload.js?ver=' . time() . '"></script>';
+});
 `;
 
 export function writeMuPlugin(runtimeDir: string): string {

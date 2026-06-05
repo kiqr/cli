@@ -44,6 +44,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
           ...this.getEnvironmentVariables(credentials),
           KIQR_LOGIN_SECRET: config.loginSecret,
           KIQR_THEME_SLUG: config.themeSlug,
+          KIQR_LIVERELOAD_PORT: '35729',
         },
         volumes: [
           `wordpress_data:/var/www/html`,
