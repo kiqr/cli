@@ -23,9 +23,26 @@ export function runDockerCompose(
   command: string,
   args: string[] = [],
 ): void {
-  execSync(`docker compose -f "${composeFile}" ${command} ${args.join(' ')}`, {
-    stdio: 'pipe',
-  });
+  try {
+    execSync(`docker compose -f "${composeFile}" ${command} ${args.join(' ')}`, {
+      stdio: 'pipe',
+    });
+  } catch (error) {
+    // execSync captures the subprocess output on the thrown error when
+    // stdio is piped. Surface it so failures (port conflicts, image pull
+    // errors, etc.) are diagnosable instead of silently swallowed.
+    const err = error as {
+      stderr?: Buffer | string;
+      stdout?: Buffer | string;
+      message?: string;
+    };
+    const detail =
+      err.stderr?.toString().trim() ||
+      err.stdout?.toString().trim() ||
+      err.message ||
+      'unknown error';
+    throw new Error(`docker compose ${command} failed:\n${detail}`);
+  }
 }
 
 export function removeDockerVolume(name: string): void {
