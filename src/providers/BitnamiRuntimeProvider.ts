@@ -65,7 +65,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         restart: 'unless-stopped',
       },
       mariadb: {
-        image: 'mariadb:latest',
+        image: 'mariadb:11.4',
         environment: {
           MARIADB_ROOT_PASSWORD: config.dbPassword,
           MARIADB_USER: credentials.dbUser,
@@ -77,7 +77,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         restart: 'unless-stopped',
       },
       wpcli: {
-        image: 'wordpress:cli',
+        image: 'wordpress:cli-php8.3',
         environment: {
           WORDPRESS_DB_HOST: 'mariadb',
           WORDPRESS_DB_NAME: credentials.dbName,
@@ -96,7 +96,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         user: '33:33',
       },
       phpmyadmin: {
-        image: 'phpmyadmin:latest',
+        image: 'phpmyadmin:5.2',
         environment: {
           PMA_HOST: 'mariadb',
           PMA_USER: 'root',

@@ -34,7 +34,7 @@ describe('generateTraefikCompose', () => {
     const yaml = generateTraefikCompose('/tmp/kiqr/traefik');
     const parsed = YAML.parse(yaml);
     expect(parsed.services.splash).toBeDefined();
-    expect(parsed.services.splash.image).toBe('nginx:alpine');
+    expect(parsed.services.splash.image).toBe('nginx:1.30-alpine');
     const labels = parsed.services.splash.labels;
     expect(labels.some((l: string) => l.includes('priority=1'))).toBe(true);
   });
