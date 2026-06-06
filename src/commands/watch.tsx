@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
+import {Box, Text} from 'ink';
 import {readProjectConfig} from '../lib/config.js';
 import {detectTheme} from '../lib/theme.js';
 import {createFileWatcher, getRelativePath} from '../lib/watch.js';
@@ -14,12 +14,11 @@ interface FileChange {
 }
 
 export default function Watch() {
-  const {exit} = useApp();
   const [isWatching, setIsWatching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [changes, setChanges] = useState<FileChange[]>([]);
   const [connected, setConnected] = useState(0);
-  const [lrPort, setLrPort] = useState(35729);
+  const [lrPort] = useState(35729);
 
   const watcherRef = useRef<{stop: () => void} | null>(null);
   const liveReloadRef = useRef<LiveReloadServer | null>(null);
