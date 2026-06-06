@@ -20,7 +20,7 @@ export const args = zod.tuple([
         '  phpmyadmin, pma            Open phpMyAdmin (auto-login)\n' +
         '  plugins                    Open the plugins folder\n' +
         '  uploads, media             Open the uploads folder\n' +
-        '  wp-content, content        Open the wp-content folder (runtime dir)',
+        '  data                       Open the Kiqr project data folder',
     }),
   ),
 ]);
@@ -41,8 +41,7 @@ const ALIASES: Record<string, string> = {
   plugins: 'plugins',
   uploads: 'uploads',
   media: 'uploads',
-  'wp-content': 'wp-content',
-  content: 'wp-content',
+  data: 'data',
 };
 
 function openTarget(target: string): void {
@@ -103,7 +102,7 @@ export default function Open({args}: Props) {
         case 'uploads':
           openTarget(getProjectUploadsDir(pc.project_id));
           break;
-        case 'wp-content':
+        case 'data':
           openTarget(runtimeDir);
           break;
       }
