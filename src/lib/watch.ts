@@ -1,5 +1,5 @@
-import fs from 'node:fs';
 import path from 'node:path';
+import chokidar from 'chokidar';
 
 export interface WatchOptions {
   extensions?: string[];
@@ -47,13 +47,13 @@ export function createFileWatcher(
   }
 
   function handleFileChange(
-    eventType: 'rename' | 'change',
+    event: 'add' | 'change' | 'unlink',
     filePath: string,
   ) {
     if (isIgnored(filePath)) return;
     if (!matchesExtensions(filePath)) return;
 
-    const key = `${eventType}:${filePath}`;
+    const key = `${event}:${filePath}`;
     const existingTimer = debounceTimers.get(key);
 
     if (existingTimer) {
@@ -62,31 +62,21 @@ export function createFileWatcher(
 
     const timer = setTimeout(() => {
       debounceTimers.delete(key);
-
-      if (eventType === 'rename') {
-        try {
-          if (fs.existsSync(filePath)) {
-            callback('add', filePath);
-          } else {
-            callback('unlink', filePath);
-          }
-        } catch {
-          callback('unlink', filePath);
-        }
-      } else {
-        callback('change', filePath);
-      }
+      callback(event, filePath);
     }, debounceDelay);
 
     debounceTimers.set(key, timer);
   }
 
-  const watcher = fs.watch(watchDir, {recursive: true}, (eventType, filename) => {
-    if (!filename) return;
-
-    const fullPath = path.join(watchDir, filename);
-    handleFileChange(eventType as 'rename' | 'change', fullPath);
+  const watcher = chokidar.watch(watchDir, {
+    ignoreInitial: true,
+    ignored: (filePath) => isIgnored(filePath),
+    persistent: true,
   });
+
+  watcher.on('add', (filePath) => handleFileChange('add', filePath));
+  watcher.on('change', (filePath) => handleFileChange('change', filePath));
+  watcher.on('unlink', (filePath) => handleFileChange('unlink', filePath));
 
   return {
     stop: () => {
@@ -94,7 +84,7 @@ export function createFileWatcher(
         clearTimeout(timer);
       }
       debounceTimers.clear();
-      watcher.close();
+      void watcher.close();
     },
   };
 }
