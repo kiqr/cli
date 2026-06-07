@@ -40,6 +40,34 @@ describe('project config', () => {
   it('returns null when kiqr.yaml does not exist', () => {
     expect(readProjectConfig(tmpDir)).toBeNull();
   });
+
+  it('throws a clear error when a required field is missing', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'kiqr.yaml'),
+      'project_id: abc\nwordpress:\n  version: latest\n  php_version: "8.3"\ndevelopment:\n  dynamic_urls: true\n',
+      'utf-8',
+    );
+    expect(() => readProjectConfig(tmpDir)).toThrow(/kiqr\.yaml is invalid/);
+    expect(() => readProjectConfig(tmpDir)).toThrow(/name/);
+  });
+
+  it('throws a clear error when a field has the wrong type', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'kiqr.yaml'),
+      'project_id: abc\nname: my-theme\nwordpress:\n  version: latest\n  php_version: "8.3"\ndevelopment:\n  dynamic_urls: "yes"\n',
+      'utf-8',
+    );
+    expect(() => readProjectConfig(tmpDir)).toThrow(/development\.dynamic_urls/);
+  });
+
+  it('throws a clear error when the YAML is malformed', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'kiqr.yaml'),
+      'name: my-theme\n  : : broken\n\t bad indent',
+      'utf-8',
+    );
+    expect(() => readProjectConfig(tmpDir)).toThrow(/kiqr\.yaml is not valid YAML/);
+  });
 });
 
 describe('local config', () => {
@@ -66,5 +94,19 @@ describe('local config', () => {
 
     const loaded = readLocalConfig(tmpDir);
     expect(loaded).toEqual(config);
+  });
+
+  it('returns null when config.yaml does not exist', () => {
+    expect(readLocalConfig(tmpDir)).toBeNull();
+  });
+
+  it('throws a clear error when a required field is missing', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'config.yaml'),
+      'project_id: test-uuid\nruntime: bitnami\n',
+      'utf-8',
+    );
+    expect(() => readLocalConfig(tmpDir)).toThrow(/config\.yaml is invalid/);
+    expect(() => readLocalConfig(tmpDir)).toThrow(/db_password/);
   });
 });
