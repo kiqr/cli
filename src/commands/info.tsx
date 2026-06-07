@@ -8,18 +8,39 @@ export const description = 'Show project info and credentials';
 export default function Info() {
   const {exit} = useApp();
 
-  const pc = readProjectConfig();
-  if (!pc) {
+  let result:
+    | {
+        ok: true;
+        pc: NonNullable<ReturnType<typeof readProjectConfig>>;
+        lc: ReturnType<typeof readLocalConfig>;
+      }
+    | {ok: false; message: string | null};
+  try {
+    const pc = readProjectConfig();
+    if (!pc) {
+      result = {ok: false, message: null};
+    } else {
+      const lc = readLocalConfig(getProjectRuntimeDir(pc.project_id));
+      result = {ok: true, pc, lc};
+    }
+  } catch (err) {
+    result = {ok: false, message: err instanceof Error ? err.message : String(err)};
+  }
+
+  if (!result.ok) {
+    const message =
+      result.message ?? 'This project is not initialized. Run "kiqr init" first.';
+    if (result.message !== null) {
+      setTimeout(() => exit(new Error(message)), 50);
+    }
     return (
       <Box paddingTop={1}>
-        <Text color="red">This project is not initialized. Run "kiqr init" first.</Text>
+        <Text color="red">{message}</Text>
       </Box>
     );
   }
 
-  const runtimeDir = getProjectRuntimeDir(pc.project_id);
-  const lc = readLocalConfig(runtimeDir);
-
+  const {pc, lc} = result;
   const hostname = buildProjectHostname(pc.name);
   const phpMyAdminHostname = buildProjectHostname(pc.name, 'phpmyadmin');
 

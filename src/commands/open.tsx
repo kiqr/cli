@@ -67,7 +67,14 @@ export default function Open({args}: Props) {
   const [appArg] = args;
 
   useEffect(() => {
-    const pc = readProjectConfig();
+    let pc: ReturnType<typeof readProjectConfig>;
+    try {
+      pc = readProjectConfig();
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : String(err));
+      exit(new Error());
+      return;
+    }
     if (!pc) {
       console.error('This project is not initialized. Run "kiqr init" first.');
       exit(new Error());
@@ -84,7 +91,14 @@ export default function Open({args}: Props) {
     }
 
     const runtimeDir = getProjectRuntimeDir(pc.project_id);
-    const lc = readLocalConfig(runtimeDir);
+    let lc: ReturnType<typeof readLocalConfig>;
+    try {
+      lc = readLocalConfig(runtimeDir);
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : String(err));
+      exit(new Error());
+      return;
+    }
     const hostname = buildProjectHostname(pc.name);
     const phpMyAdminHostname = buildProjectHostname(pc.name, 'phpmyadmin');
 

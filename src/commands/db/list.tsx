@@ -29,7 +29,14 @@ export default function DbList() {
 
   useEffect(() => {
     (async () => {
-      const pc = readProjectConfig();
+      let pc: ReturnType<typeof readProjectConfig>;
+      try {
+        pc = readProjectConfig();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+        setTimeout(() => exit(new Error()), 100);
+        return;
+      }
       if (!pc) {
         setError('This project is not initialized. Run "kiqr init" first.');
         setTimeout(() => exit(new Error()), 100);
