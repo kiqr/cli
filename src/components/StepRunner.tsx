@@ -1,6 +1,6 @@
-import {useState, useEffect} from 'react';
-import {Box, Text} from 'ink';
 import {Spinner, StatusMessage} from '@inkjs/ui';
+import {Box, Text} from 'ink';
+import {useEffect, useState} from 'react';
 
 export interface Step {
   label: string;

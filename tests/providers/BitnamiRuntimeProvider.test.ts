@@ -1,4 +1,4 @@
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {BitnamiRuntimeProvider} from '../../src/providers/BitnamiRuntimeProvider.js';
 
 describe('BitnamiRuntimeProvider', () => {

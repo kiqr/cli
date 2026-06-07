@@ -58,7 +58,9 @@ export function isContainerRunning(name: string): boolean {
     const output = execSync(
       `docker ps --filter "name=${name}" --filter "status=running" --format "{{.Names}}"`,
       {stdio: 'pipe'},
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
     return output.includes(name);
   } catch {
     return false;

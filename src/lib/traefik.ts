@@ -1,11 +1,11 @@
-import YAML from 'yaml';
+import {execSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import {execSync} from 'node:child_process';
-import {getTraefikDir} from './paths.js';
+import YAML from 'yaml';
 import {runDockerCompose} from './docker.js';
-import {writeSplashPage} from './splash.js';
 import {writeNginxSplashConf} from './nginx-splash.js';
+import {getTraefikDir} from './paths.js';
+import {writeSplashPage} from './splash.js';
 
 export const KIQR_NETWORK = 'kiqr';
 const TRAEFIK_CONTAINER = 'kiqr-traefik';
@@ -96,7 +96,9 @@ function hasRunningProjects(): boolean {
     const output = execSync(
       `docker ps --filter "network=${KIQR_NETWORK}" --filter "status=running" --format "{{.Names}}"`,
       {stdio: 'pipe'},
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
 
     if (!output) return false;
 

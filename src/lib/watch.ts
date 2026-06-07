@@ -6,7 +6,10 @@ export interface WatchOptions {
   ignored?: RegExp | string[];
 }
 
-export type FileChangeCallback = (event: 'add' | 'change' | 'unlink', filePath: string) => void;
+export type FileChangeCallback = (
+  event: 'add' | 'change' | 'unlink',
+  filePath: string,
+) => void;
 
 export function createFileWatcher(
   watchDir: string,
@@ -29,13 +32,7 @@ export function createFileWatcher(
     const relativePath = path.relative(watchDir, filePath);
 
     // Ignore common non-theme directories
-    const ignorePatterns = [
-      /node_modules/,
-      /\.git/,
-      /\.env/,
-      /vendor/,
-      /\.cache/,
-    ];
+    const ignorePatterns = [/node_modules/, /\.git/, /\.env/, /vendor/, /\.cache/];
 
     return ignorePatterns.some((pattern) => pattern.test(relativePath));
   }
@@ -46,10 +43,7 @@ export function createFileWatcher(
     return extensions.some((e) => e.toLowerCase() === ext);
   }
 
-  function handleFileChange(
-    event: 'add' | 'change' | 'unlink',
-    filePath: string,
-  ) {
+  function handleFileChange(event: 'add' | 'change' | 'unlink', filePath: string) {
     if (isIgnored(filePath)) return;
     if (!matchesExtensions(filePath)) return;
 

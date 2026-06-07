@@ -25,9 +25,7 @@ export default function Doctor() {
     <Box flexDirection="column" paddingTop={1}>
       {checks.map((check) => (
         <Box key={check.name}>
-          <Text color={check.ok ? 'green' : 'red'}>
-            {check.ok ? '✓' : '✗'}{' '}
-          </Text>
+          <Text color={check.ok ? 'green' : 'red'}>{check.ok ? '✓' : '✗'} </Text>
           <Text>{check.name}</Text>
           <Text dimColor> — {check.detail}</Text>
         </Box>
@@ -39,8 +37,7 @@ export default function Doctor() {
           </Text>
         ) : (
           <Text bold color="red">
-            Some checks failed. Resolve the issues above and run "kiqr doctor"
-            again.
+            Some checks failed. Resolve the issues above and run "kiqr doctor" again.
           </Text>
         )}
       </Box>

@@ -1,8 +1,11 @@
-import type {RuntimeProvider} from '../providers/RuntimeProvider.js';
 import {BitnamiRuntimeProvider} from '../providers/BitnamiRuntimeProvider.js';
+import type {RuntimeProvider} from '../providers/RuntimeProvider.js';
 
-export type {RuntimeProvider} from '../providers/RuntimeProvider.js';
-export type {RuntimeConfig, ComposeService} from '../providers/RuntimeProvider.js';
+export type {
+  ComposeService,
+  RuntimeConfig,
+  RuntimeProvider,
+} from '../providers/RuntimeProvider.js';
 
 export function createRuntimeProvider(runtime: string = 'bitnami'): RuntimeProvider {
   switch (runtime) {

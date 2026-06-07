@@ -1,9 +1,9 @@
-import {useState, useEffect, useRef} from 'react';
 import {Box, Text} from 'ink';
+import {useEffect, useRef, useState} from 'react';
 import {readProjectConfig} from '../lib/config.js';
+import {LiveReloadServer} from '../lib/livereload.js';
 import {detectTheme} from '../lib/theme.js';
 import {createFileWatcher, getRelativePath} from '../lib/watch.js';
-import {LiveReloadServer} from '../lib/livereload.js';
 
 export const description = 'Watch theme files and auto-reload the browser';
 
@@ -55,7 +55,16 @@ export default function Watch() {
         const watcher = createFileWatcher(
           theme.path,
           {
-            extensions: ['.php', '.css', '.js', '.scss', '.sass', '.less', '.html', '.txt'],
+            extensions: [
+              '.php',
+              '.css',
+              '.js',
+              '.scss',
+              '.sass',
+              '.less',
+              '.html',
+              '.txt',
+            ],
           },
           (eventType, filePath) => {
             const relativePath = getRelativePath(theme.path, filePath);
@@ -106,7 +115,9 @@ export default function Watch() {
   if (error) {
     return (
       <Box flexDirection="column" paddingTop={1}>
-        <Text bold color="red">Error</Text>
+        <Text bold color="red">
+          Error
+        </Text>
         <Text color="red">{error}</Text>
         <Box marginTop={1}>
           <Text dimColor>Press any key to exit...</Text>
@@ -126,7 +137,9 @@ export default function Watch() {
   return (
     <Box flexDirection="column" paddingTop={1}>
       <Box flexDirection="column">
-        <Text bold color="green">Watching for file changes</Text>
+        <Text bold color="green">
+          Watching for file changes
+        </Text>
         <Text dimColor>Browser will auto-reload on changes</Text>
       </Box>
 
@@ -146,17 +159,18 @@ export default function Watch() {
         {changes.length === 0 ? (
           <Text dimColor>Waiting for changes...</Text>
         ) : (
-          changes.slice(-10).reverse().map((change, i) => (
-            <Text key={`${change.path}-${change.timestamp.getTime()}-${i}`}>
-              <Text dimColor>
-                [{change.timestamp.toLocaleTimeString()}]
-              </Text>{' '}
-              <Text color={change.type === 'unlink' ? 'red' : 'green'}>
-                [{change.type}]
-              </Text>{' '}
-              {change.path}
-            </Text>
-          ))
+          changes
+            .slice(-10)
+            .reverse()
+            .map((change, i) => (
+              <Text key={`${change.path}-${change.timestamp.getTime()}-${i}`}>
+                <Text dimColor>[{change.timestamp.toLocaleTimeString()}]</Text>{' '}
+                <Text color={change.type === 'unlink' ? 'red' : 'green'}>
+                  [{change.type}]
+                </Text>{' '}
+                {change.path}
+              </Text>
+            ))
         )}
       </Box>
 

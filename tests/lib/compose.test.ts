@@ -1,7 +1,7 @@
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+import YAML from 'yaml';
 import {generateProjectCompose} from '../../src/lib/compose.js';
 import type {RuntimeConfig} from '../../src/providers/RuntimeProvider.js';
-import YAML from 'yaml';
 
 describe('generateProjectCompose', () => {
   const config: RuntimeConfig = {

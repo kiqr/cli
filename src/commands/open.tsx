@@ -1,28 +1,35 @@
-import {useEffect} from 'react';
-import {Box, Text, useApp} from 'ink';
 import {execSync} from 'node:child_process';
-import zod from 'zod';
+import {Box, Text, useApp} from 'ink';
 import {argument} from 'pastel';
-import {readProjectConfig, readLocalConfig} from '../lib/config.js';
-import {getProjectRuntimeDir, getProjectPluginsDir, getProjectUploadsDir} from '../lib/paths.js';
+import {useEffect} from 'react';
+import zod from 'zod';
+import {readLocalConfig, readProjectConfig} from '../lib/config.js';
 import {buildProjectHostname} from '../lib/hostname.js';
+import {
+  getProjectPluginsDir,
+  getProjectRuntimeDir,
+  getProjectUploadsDir,
+} from '../lib/paths.js';
 
 export const description = 'Open a site URL or folder in your browser/explorer';
 
 export const args = zod.tuple([
-  zod.string().optional().describe(
-    argument({
-      name: 'app',
-      description:
-        'What to open (default: wp)\n\n' +
-        '  wp, wordpress, web        Open the site\n' +
-        '  admin, wpadmin, dashboard  Open the WordPress dashboard (auto-login)\n' +
-        '  phpmyadmin, pma            Open phpMyAdmin (auto-login)\n' +
-        '  plugins                    Open the plugins folder\n' +
-        '  uploads, media             Open the uploads folder\n' +
-        '  data                       Open the Kiqr project data folder',
-    }),
-  ),
+  zod
+    .string()
+    .optional()
+    .describe(
+      argument({
+        name: 'app',
+        description:
+          'What to open (default: wp)\n\n' +
+          '  wp, wordpress, web        Open the site\n' +
+          '  admin, wpadmin, dashboard  Open the WordPress dashboard (auto-login)\n' +
+          '  phpmyadmin, pma            Open phpMyAdmin (auto-login)\n' +
+          '  plugins                    Open the plugins folder\n' +
+          '  uploads, media             Open the uploads folder\n' +
+          '  data                       Open the Kiqr project data folder',
+      }),
+    ),
 ]);
 
 type Props = {

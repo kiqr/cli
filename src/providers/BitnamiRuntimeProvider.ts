@@ -1,8 +1,8 @@
 import type {
-  RuntimeProvider,
-  RuntimeConfig,
   ComposeService,
   DatabaseCredentials,
+  RuntimeConfig,
+  RuntimeProvider,
 } from './RuntimeProvider.js';
 
 const KIQR_NETWORK = 'kiqr';

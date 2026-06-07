@@ -1,7 +1,7 @@
-import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 import {writeSplashPage} from '../../src/lib/splash.js';
 
 describe('writeSplashPage', () => {
@@ -50,7 +50,9 @@ describe('writeSplashPage', () => {
   it('renders the requested hostname client-side', () => {
     const content = fs.readFileSync(writeSplashPage(tmp), 'utf-8');
     expect(content).toContain('id="hostname"');
-    expect(content).toContain("document.getElementById('hostname').textContent = location.host");
+    expect(content).toContain(
+      "document.getElementById('hostname').textContent = location.host",
+    );
   });
 
   it('links back to the Kiqr project', () => {

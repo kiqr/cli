@@ -1,6 +1,6 @@
-import {describe, it, expect, vi} from 'vitest';
-import {sanitizeHostname, buildProjectHostname} from '../../src/lib/hostname.js';
 import os from 'node:os';
+import {describe, expect, it, vi} from 'vitest';
+import {buildProjectHostname, sanitizeHostname} from '../../src/lib/hostname.js';
 
 vi.mock('node:os', () => ({
   default: {hostname: vi.fn()},

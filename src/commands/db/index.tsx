@@ -9,9 +9,18 @@ export default function DbIndex() {
       <Text dimColor>Backup and restore the project database</Text>
       <Text> </Text>
       <Text>Commands:</Text>
-      <Text>  <Text bold>kiqr db dump</Text>           Create a compressed SQL backup</Text>
-      <Text>  <Text bold>kiqr db list</Text>           List available backups</Text>
-      <Text>  <Text bold>kiqr db restore &lt;id&gt;</Text>    Restore from a backup</Text>
+      <Text>
+        {' '}
+        <Text bold>kiqr db dump</Text> Create a compressed SQL backup
+      </Text>
+      <Text>
+        {' '}
+        <Text bold>kiqr db list</Text> List available backups
+      </Text>
+      <Text>
+        {' '}
+        <Text bold>kiqr db restore &lt;id&gt;</Text> Restore from a backup
+      </Text>
     </Box>
   );
 }

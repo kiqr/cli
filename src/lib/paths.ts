@@ -33,14 +33,23 @@ export function getTraefikDir(platform: NodeJS.Platform = process.platform): str
   return path.join(getKiqrDataDir(platform), 'traefik');
 }
 
-export function getProjectPluginsDir(projectId: string, platform: NodeJS.Platform = process.platform): string {
+export function getProjectPluginsDir(
+  projectId: string,
+  platform: NodeJS.Platform = process.platform,
+): string {
   return path.join(getProjectRuntimeDir(projectId, platform), 'plugins');
 }
 
-export function getProjectUploadsDir(projectId: string, platform: NodeJS.Platform = process.platform): string {
+export function getProjectUploadsDir(
+  projectId: string,
+  platform: NodeJS.Platform = process.platform,
+): string {
   return path.join(getProjectRuntimeDir(projectId, platform), 'uploads');
 }
 
-export function getProjectBackupsDir(projectId: string, platform: NodeJS.Platform = process.platform): string {
+export function getProjectBackupsDir(
+  projectId: string,
+  platform: NodeJS.Platform = process.platform,
+): string {
   return path.join(getProjectRuntimeDir(projectId, platform), 'backups');
 }

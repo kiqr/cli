@@ -1,6 +1,6 @@
-import {describe, it, expect} from 'vitest';
-import {generateTraefikCompose} from '../../src/lib/traefik.js';
+import {describe, expect, it} from 'vitest';
 import YAML from 'yaml';
+import {generateTraefikCompose} from '../../src/lib/traefik.js';
 
 describe('generateTraefikCompose', () => {
   it('generates valid compose YAML for Traefik', () => {

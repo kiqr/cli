@@ -1,18 +1,27 @@
-import {useState, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
-import StepRunner from '../components/StepRunner.js';
-import type {Step} from '../components/StepRunner.js';
-import {isDockerInstalled, isDockerRunning, runDockerCompose, removeDockerVolume} from '../lib/docker.js';
-import {readProjectConfig, readLocalConfig, writeLocalConfig} from '../lib/config.js';
-import {getProjectRuntimeDir, getProjectPluginsDir, getProjectUploadsDir} from '../lib/paths.js';
-import {ensureTraefikRunning} from '../lib/traefik.js';
-import {buildProjectHostname} from '../lib/hostname.js';
-import {detectTheme} from '../lib/theme.js';
-import {writeProjectCompose} from '../lib/compose.js';
-import {writeMuPlugin} from '../lib/mu-plugin.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import type {ProjectConfig, LocalConfig} from '../types/config.js';
+import {Box, Text, useApp} from 'ink';
+import {useRef, useState} from 'react';
+import type {Step} from '../components/StepRunner.js';
+import StepRunner from '../components/StepRunner.js';
+import {writeProjectCompose} from '../lib/compose.js';
+import {readLocalConfig, readProjectConfig, writeLocalConfig} from '../lib/config.js';
+import {
+  isDockerInstalled,
+  isDockerRunning,
+  removeDockerVolume,
+  runDockerCompose,
+} from '../lib/docker.js';
+import {buildProjectHostname} from '../lib/hostname.js';
+import {writeMuPlugin} from '../lib/mu-plugin.js';
+import {
+  getProjectPluginsDir,
+  getProjectRuntimeDir,
+  getProjectUploadsDir,
+} from '../lib/paths.js';
+import {detectTheme} from '../lib/theme.js';
+import {ensureTraefikRunning} from '../lib/traefik.js';
+import type {LocalConfig, ProjectConfig} from '../types/config.js';
 
 export const description = 'Restart the WordPress development environment';
 
@@ -165,13 +174,19 @@ export default function Restart() {
       />
       {complete && (
         <Box flexDirection="column" marginTop={1}>
-          <Text bold color="green">Your site is ready!</Text>
+          <Text bold color="green">
+            Your site is ready!
+          </Text>
           <Text> </Text>
           <Text>Site:</Text>
-          <Text bold color="cyan">{siteUrl}</Text>
+          <Text bold color="cyan">
+            {siteUrl}
+          </Text>
           <Text> </Text>
           <Text>phpMyAdmin:</Text>
-          <Text bold color="cyan">{pmaUrl}</Text>
+          <Text bold color="cyan">
+            {pmaUrl}
+          </Text>
         </Box>
       )}
     </Box>
