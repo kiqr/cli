@@ -27,10 +27,27 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
       WORDPRESS_DB_NAME: credentials.dbName,
       WORDPRESS_DB_USER: credentials.dbUser,
       WORDPRESS_DB_PASSWORD: credentials.dbPassword,
+      // WordPress generates absolute URLs (links, asset/script tags, redirects)
+      // from WP_HOME / WP_SITEURL. We derive them dynamically from the incoming
+      // request so the site works under both its local hostname and a public
+      // Cloudflare tunnel (`kiqr share`) without reconfiguring anything.
+      //
+      // When the request arrives through a tunnel, cloudflared forwards the
+      // original public hostname as `X-Forwarded-Host` and the scheme as
+      // `X-Forwarded-Proto`, while the actual `Host` header is rewritten to the
+      // local Traefik route. So prefer the forwarded values when present, and
+      // fall back to `HTTP_HOST` over plain http for normal local requests --
+      // which keeps local behavior identical to before.
+      //
+      // This string is embedded verbatim into the docker-compose YAML, where
+      // Compose treats `$` as an interpolation sigil. Every PHP `$` is written
+      // as `$$` so Compose unescapes it back to a single `$` for PHP.
       WORDPRESS_CONFIG_EXTRA:
         "define('KIQR_DEVELOPMENT', true); " +
-        "define('WP_HOME', 'http://' . $$_SERVER['HTTP_HOST']); " +
-        "define('WP_SITEURL', 'http://' . $$_SERVER['HTTP_HOST']);",
+        "$$host = !empty($$_SERVER['HTTP_X_FORWARDED_HOST']) ? $$_SERVER['HTTP_X_FORWARDED_HOST'] : $$_SERVER['HTTP_HOST']; " +
+        "$$proto = (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https' : 'http'; " +
+        "define('WP_HOME', $$proto . '://' . $$host); " +
+        "define('WP_SITEURL', $$proto . '://' . $$host);",
     };
   }
 

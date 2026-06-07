@@ -43,6 +43,10 @@ export default function Index() {
       </Text>
       <Text>
         {' '}
+        <Text bold>kiqr share</Text> Expose your local site at a public URL
+      </Text>
+      <Text>
+        {' '}
         <Text bold>kiqr wp</Text> Run a WP-CLI command
       </Text>
       <Text>
