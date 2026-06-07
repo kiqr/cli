@@ -43,7 +43,7 @@ describe('BitnamiRuntimeProvider', () => {
     expect(services['mariadb']).toBeDefined();
     expect(services['phpmyadmin']).toBeDefined();
     expect(services['wordpress']!.image).toBe('wordpress:6.7');
-    expect(services['mariadb']!.image).toBe('mariadb:latest');
+    expect(services['mariadb']!.image).toBe('mariadb:11.4');
   });
 
   it('uses latest when version is latest', () => {

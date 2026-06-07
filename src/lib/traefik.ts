@@ -29,7 +29,7 @@ export function generateTraefikCompose(traefikDir: string): string {
         restart: 'unless-stopped',
       },
       splash: {
-        image: 'nginx:alpine',
+        image: 'nginx:1.30-alpine',
         container_name: 'kiqr-splash',
         volumes: [
           `${path.join(traefikDir, 'splash.html')}:/usr/share/nginx/html/splash.html:ro`,
