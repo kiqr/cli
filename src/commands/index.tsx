@@ -9,6 +9,7 @@ export default function Index() {
       <Text dimColor>Local WordPress theme development</Text>
       <Text> </Text>
       <Text>Commands:</Text>
+      <Text>  <Text bold>kiqr doctor</Text>    Check your environment for common problems</Text>
       <Text>  <Text bold>kiqr init</Text>      Initialize a new project</Text>
       <Text>  <Text bold>kiqr up</Text>        Start the development environment</Text>
       <Text>  <Text bold>kiqr down</Text>      Stop the development environment</Text>
