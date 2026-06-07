@@ -1,13 +1,5 @@
-import os from 'node:os';
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {buildProjectHostname, sanitizeHostname} from '../../src/lib/hostname.js';
-
-vi.mock('node:os', () => ({
-  default: {hostname: vi.fn()},
-  hostname: vi.fn(),
-}));
-
-const mockHostname = vi.mocked(os.hostname);
 
 describe('sanitizeHostname', () => {
   it('lowercases and strips .local suffix', () => {
@@ -28,15 +20,13 @@ describe('sanitizeHostname', () => {
 });
 
 describe('buildProjectHostname', () => {
-  it('combines project slug with machine hostname', () => {
-    mockHostname.mockReturnValue('rasmus-macbook.local');
-    expect(buildProjectHostname('my-theme')).toBe('my-theme.rasmus-macbook.lvh.me');
+  it('uses the project slug directly under lvh.me', () => {
+    expect(buildProjectHostname('my-theme')).toBe('my-theme.lvh.me');
   });
 
-  it('builds phpmyadmin subdomain', () => {
-    mockHostname.mockReturnValue('rasmus-macbook.local');
+  it('builds a phpmyadmin subdomain', () => {
     expect(buildProjectHostname('my-theme', 'phpmyadmin')).toBe(
-      'phpmyadmin.my-theme.rasmus-macbook.lvh.me',
+      'phpmyadmin.my-theme.lvh.me',
     );
   });
 });
