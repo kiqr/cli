@@ -11,7 +11,14 @@ export default function Logs() {
   const {exit} = useApp();
 
   useEffect(() => {
-    const pc = readProjectConfig();
+    let pc: ReturnType<typeof readProjectConfig>;
+    try {
+      pc = readProjectConfig();
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : String(err));
+      exit(new Error());
+      return;
+    }
     if (!pc) {
       console.error('This project is not initialized. Run "kiqr init" first.');
       exit(new Error());

@@ -28,7 +28,13 @@ export default function Watch() {
     let mounted = true;
 
     async function startWatch() {
-      const pc = readProjectConfig();
+      let pc: ReturnType<typeof readProjectConfig>;
+      try {
+        pc = readProjectConfig();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+        return;
+      }
       if (!pc) {
         setError('This project is not initialized. Run "kiqr init" first.');
         return;
