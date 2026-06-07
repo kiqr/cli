@@ -1,11 +1,11 @@
-import {useEffect} from 'react';
-import {Box, Text, useApp} from 'ink';
 import {execSync} from 'node:child_process';
-import zod from 'zod';
+import path from 'node:path';
+import {Box, Text, useApp} from 'ink';
 import {argument} from 'pastel';
+import {useEffect} from 'react';
+import zod from 'zod';
 import {readProjectConfig} from '../lib/config.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
-import path from 'node:path';
 
 export const description = 'Run a WP-CLI command';
 
@@ -22,7 +22,7 @@ type Props = {
   args: zod.infer<typeof args>;
 };
 
-export default function Wp({}: Props) {
+export default function Wp(_props: Props) {
   const {exit} = useApp();
 
   useEffect(() => {
@@ -41,19 +41,17 @@ export default function Wp({}: Props) {
     const rawArgs = wpIndex >= 0 ? process.argv.slice(wpIndex + 1) : [];
 
     if (rawArgs.length === 0) {
-      execSync(
-        `docker compose -f "${composePath}" run --rm wpcli --help`,
-        {stdio: 'inherit'},
-      );
+      execSync(`docker compose -f "${composePath}" run --rm wpcli --help`, {
+        stdio: 'inherit',
+      });
       exit();
       return;
     }
 
     try {
-      execSync(
-        `docker compose -f "${composePath}" run --rm wpcli ${rawArgs.join(' ')}`,
-        {stdio: 'inherit'},
-      );
+      execSync(`docker compose -f "${composePath}" run --rm wpcli ${rawArgs.join(' ')}`, {
+        stdio: 'inherit',
+      });
     } catch {
       // WP-CLI exits with non-zero for errors — already printed to stderr
     }

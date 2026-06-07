@@ -1,4 +1,4 @@
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {findAvailablePort, isPortAvailable} from '../../src/lib/ports.js';
 
 describe('isPortAvailable', () => {

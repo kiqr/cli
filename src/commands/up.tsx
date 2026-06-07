@@ -1,26 +1,35 @@
-import {useState, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
-import {ConfirmInput} from '@inkjs/ui';
 import {randomUUID} from 'node:crypto';
-import StepRunner from '../components/StepRunner.js';
-import type {Step} from '../components/StepRunner.js';
-import {isDockerInstalled, isDockerRunning, runDockerCompose, removeDockerVolume} from '../lib/docker.js';
-import {
-  readProjectConfig,
-  readLocalConfig,
-  writeProjectConfig,
-  writeLocalConfig,
-  projectConfigExists,
-} from '../lib/config.js';
-import {getProjectRuntimeDir, getProjectPluginsDir, getProjectUploadsDir} from '../lib/paths.js';
-import {ensureTraefikRunning} from '../lib/traefik.js';
-import {buildProjectHostname} from '../lib/hostname.js';
-import {detectTheme} from '../lib/theme.js';
-import {writeProjectCompose} from '../lib/compose.js';
-import {writeMuPlugin} from '../lib/mu-plugin.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import type {ProjectConfig, LocalConfig} from '../types/config.js';
+import {ConfirmInput} from '@inkjs/ui';
+import {Box, Text, useApp} from 'ink';
+import {useRef, useState} from 'react';
+import type {Step} from '../components/StepRunner.js';
+import StepRunner from '../components/StepRunner.js';
+import {writeProjectCompose} from '../lib/compose.js';
+import {
+  projectConfigExists,
+  readLocalConfig,
+  readProjectConfig,
+  writeLocalConfig,
+  writeProjectConfig,
+} from '../lib/config.js';
+import {
+  isDockerInstalled,
+  isDockerRunning,
+  removeDockerVolume,
+  runDockerCompose,
+} from '../lib/docker.js';
+import {buildProjectHostname} from '../lib/hostname.js';
+import {writeMuPlugin} from '../lib/mu-plugin.js';
+import {
+  getProjectPluginsDir,
+  getProjectRuntimeDir,
+  getProjectUploadsDir,
+} from '../lib/paths.js';
+import {detectTheme} from '../lib/theme.js';
+import {ensureTraefikRunning} from '../lib/traefik.js';
+import type {LocalConfig, ProjectConfig} from '../types/config.js';
 
 export const description = 'Start the WordPress development environment';
 
@@ -39,7 +48,13 @@ export default function Up() {
     runtimeDir: string;
     composePath: string;
     checked: boolean;
-  }>({projectConfig: null, localConfig: null, runtimeDir: '', composePath: '', checked: false});
+  }>({
+    projectConfig: null,
+    localConfig: null,
+    runtimeDir: '',
+    composePath: '',
+    checked: false,
+  });
 
   if (!ref.current.checked) {
     ref.current.checked = true;
@@ -57,14 +72,12 @@ export default function Up() {
     return (
       <Box flexDirection="column" paddingTop={1}>
         <Text>
-          No project configuration found, but <Text bold>{themeName}</Text> looks like a WordPress theme.
+          No project configuration found, but <Text bold>{themeName}</Text> looks like a
+          WordPress theme.
         </Text>
         <Box marginTop={1}>
           <Text>Initialize this project? </Text>
-          <ConfirmInput
-            onConfirm={() => setConfirmed(true)}
-            onCancel={() => exit()}
-          />
+          <ConfirmInput onConfirm={() => setConfirmed(true)} onCancel={() => exit()} />
         </Box>
       </Box>
     );
@@ -229,13 +242,19 @@ export default function Up() {
       />
       {complete && (
         <Box flexDirection="column" marginTop={1}>
-          <Text bold color="green">Your site is ready!</Text>
+          <Text bold color="green">
+            Your site is ready!
+          </Text>
           <Text> </Text>
           <Text>Site:</Text>
-          <Text bold color="cyan">{siteUrl}</Text>
+          <Text bold color="cyan">
+            {siteUrl}
+          </Text>
           <Text> </Text>
           <Text>phpMyAdmin:</Text>
-          <Text bold color="cyan">{pmaUrl}</Text>
+          <Text bold color="cyan">
+            {pmaUrl}
+          </Text>
           <Text> </Text>
           <Text dimColor>WordPress may take a minute to fully start on first run.</Text>
         </Box>

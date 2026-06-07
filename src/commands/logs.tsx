@@ -1,9 +1,9 @@
-import {useEffect} from 'react';
-import {Box, Text, useApp} from 'ink';
-import {readProjectConfig} from '../lib/config.js';
-import {getProjectRuntimeDir} from '../lib/paths.js';
 import {execSync} from 'node:child_process';
 import path from 'node:path';
+import {Box, Text, useApp} from 'ink';
+import {useEffect} from 'react';
+import {readProjectConfig} from '../lib/config.js';
+import {getProjectRuntimeDir} from '../lib/paths.js';
 
 export const description = 'Show WordPress logs';
 

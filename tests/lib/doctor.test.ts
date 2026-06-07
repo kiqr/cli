@@ -42,9 +42,7 @@ describe('runDoctorChecks', () => {
     expect(find(checks, 'Docker installed').ok).toBe(true);
     expect(find(checks, 'Docker running').ok).toBe(true);
     expect(find(checks, `Traefik port ${TRAEFIK_PORT} available`).ok).toBe(true);
-    expect(find(checks, `LiveReload port ${LIVERELOAD_PORT} available`).ok).toBe(
-      true,
-    );
+    expect(find(checks, `LiveReload port ${LIVERELOAD_PORT} available`).ok).toBe(true);
   });
 
   it('fails the Docker installed check when the CLI is missing', async () => {
@@ -79,9 +77,7 @@ describe('runDoctorChecks', () => {
     mockPort.mockImplementation(async (port: number) => port !== TRAEFIK_PORT);
     const checks = await runDoctorChecks();
     expect(find(checks, `Traefik port ${TRAEFIK_PORT} available`).ok).toBe(false);
-    expect(find(checks, `LiveReload port ${LIVERELOAD_PORT} available`).ok).toBe(
-      true,
-    );
+    expect(find(checks, `LiveReload port ${LIVERELOAD_PORT} available`).ok).toBe(true);
   });
 
   it('always reports the platform check as informational (ok)', async () => {
@@ -103,9 +99,7 @@ describe('isWSL', () => {
   });
 
   it('returns false for a native kernel', () => {
-    vi.spyOn(fs, 'readFileSync').mockReturnValue(
-      'Linux version 6.0.0-generic',
-    );
+    vi.spyOn(fs, 'readFileSync').mockReturnValue('Linux version 6.0.0-generic');
     expect(isWSL()).toBe(false);
   });
 

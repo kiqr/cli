@@ -1,13 +1,13 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
-import {pipeline} from 'node:stream/promises';
 import type {Readable} from 'node:stream';
+import {pipeline} from 'node:stream/promises';
 import {
   BACKUP_EXTENSION,
-  SIDECAR_EXTENSION,
   buildBackupFilename,
   parseBackupFilename,
+  SIDECAR_EXTENSION,
 } from './backups.js';
 
 export interface BackupRecord {
@@ -70,7 +70,9 @@ export class LocalBackupStorage implements BackupStorage {
       const backupPath = path.join(this.dir, name);
       const sidecarPath = this.sidecarPathFor(backupPath);
       if (!fs.existsSync(sidecarPath)) continue;
-      const sidecar = JSON.parse(await fs.promises.readFile(sidecarPath, 'utf-8')) as SidecarJson;
+      const sidecar = JSON.parse(
+        await fs.promises.readFile(sidecarPath, 'utf-8'),
+      ) as SidecarJson;
       records.push({
         id: sidecar.id,
         filename: name,
@@ -99,7 +101,11 @@ export class LocalBackupStorage implements BackupStorage {
 
   async save(stream: Readable, opts: SaveOptions): Promise<BackupRecord> {
     fs.mkdirSync(this.dir, {recursive: true});
-    const filename = buildBackupFilename({host: opts.host, date: opts.createdAt, id: opts.id});
+    const filename = buildBackupFilename({
+      host: opts.host,
+      date: opts.createdAt,
+      id: opts.id,
+    });
     const backupPath = path.join(this.dir, filename);
     const sidecarPath = this.sidecarPathFor(backupPath);
 

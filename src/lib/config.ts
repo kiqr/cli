@@ -42,11 +42,7 @@ function formatIssues(error: z.ZodError): string {
     .join(', ');
 }
 
-function parseConfig<T>(
-  schema: z.ZodType<T>,
-  content: string,
-  fileName: string,
-): T {
+function parseConfig<T>(schema: z.ZodType<T>, content: string, fileName: string): T {
   let parsed: unknown;
   try {
     parsed = YAML.parse(content);
@@ -66,9 +62,7 @@ export function projectConfigExists(dir: string = process.cwd()): boolean {
   return fs.existsSync(path.join(dir, PROJECT_CONFIG_FILE));
 }
 
-export function readProjectConfig(
-  dir: string = process.cwd(),
-): ProjectConfig | null {
+export function readProjectConfig(dir: string = process.cwd()): ProjectConfig | null {
   const filePath = path.join(dir, PROJECT_CONFIG_FILE);
   if (!fs.existsSync(filePath)) return null;
   const content = fs.readFileSync(filePath, 'utf-8');

@@ -1,4 +1,4 @@
-import {spawn, spawnSync, type ChildProcessByStdio} from 'node:child_process';
+import {type ChildProcessByStdio, spawn, spawnSync} from 'node:child_process';
 import type {Readable, Writable} from 'node:stream';
 
 export function buildWpCliArgs(composePath: string, wpArgs: string[]): string[] {
@@ -14,8 +14,12 @@ export function spawnWpCli(composePath: string, wpArgs: string[]): WpCliProcess 
 }
 
 export function isWordPressInstalled(composePath: string): boolean {
-  const result = spawnSync('docker', buildWpCliArgs(composePath, ['wp', 'core', 'is-installed']), {
-    stdio: 'pipe',
-  });
+  const result = spawnSync(
+    'docker',
+    buildWpCliArgs(composePath, ['wp', 'core', 'is-installed']),
+    {
+      stdio: 'pipe',
+    },
+  );
   return result.status === 0;
 }

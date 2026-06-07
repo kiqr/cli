@@ -1,12 +1,12 @@
-import {useState, useRef} from 'react';
+import path from 'node:path';
 import {Box, Text, useApp} from 'ink';
-import StepRunner from '../components/StepRunner.js';
+import {useRef, useState} from 'react';
 import type {Step} from '../components/StepRunner.js';
-import {runDockerCompose} from '../lib/docker.js';
+import StepRunner from '../components/StepRunner.js';
 import {readProjectConfig} from '../lib/config.js';
+import {runDockerCompose} from '../lib/docker.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
 import {stopTraefikIfIdle} from '../lib/traefik.js';
-import path from 'node:path';
 import type {ProjectConfig} from '../types/config.js';
 
 export const description = 'Stop the WordPress development environment';
@@ -60,7 +60,9 @@ export default function Down() {
       />
       {complete && (
         <Box flexDirection="column" marginTop={1}>
-          <Text bold color="green">Your site has been stopped.</Text>
+          <Text bold color="green">
+            Your site has been stopped.
+          </Text>
         </Box>
       )}
     </Box>

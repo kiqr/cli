@@ -1,16 +1,16 @@
-import {useState, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
+import path from 'node:path';
 import {createGzip} from 'node:zlib';
-import StepRunner from '../../components/StepRunner.js';
+import {Box, Text, useApp} from 'ink';
+import {useRef, useState} from 'react';
 import type {Step} from '../../components/StepRunner.js';
-import {readProjectConfig} from '../../lib/config.js';
-import {getProjectRuntimeDir, getProjectBackupsDir} from '../../lib/paths.js';
-import {getMachineHostname} from '../../lib/hostname.js';
+import StepRunner from '../../components/StepRunner.js';
+import type {BackupRecord} from '../../lib/backup-storage.js';
 import {createBackupStorage} from '../../lib/backup-storage.js';
 import {encodeBackupId} from '../../lib/backups.js';
+import {readProjectConfig} from '../../lib/config.js';
+import {getMachineHostname} from '../../lib/hostname.js';
+import {getProjectBackupsDir, getProjectRuntimeDir} from '../../lib/paths.js';
 import {spawnWpCli} from '../../lib/wpcli.js';
-import type {BackupRecord} from '../../lib/backup-storage.js';
-import path from 'node:path';
 
 export const description = 'Create a compressed SQL backup of the database';
 
@@ -27,7 +27,10 @@ export default function DbDump() {
         if (!pc) {
           throw new Error('This project is not initialized. Run "kiqr init" first.');
         }
-        const composePath = path.join(getProjectRuntimeDir(pc.project_id), 'compose.yaml');
+        const composePath = path.join(
+          getProjectRuntimeDir(pc.project_id),
+          'compose.yaml',
+        );
         const storage = createBackupStorage(getProjectBackupsDir(pc.project_id));
         const createdAt = new Date();
         const id = encodeBackupId(createdAt);
@@ -51,7 +54,9 @@ export default function DbDump() {
               if (code === 0) resolve();
               else {
                 const msg = Buffer.concat(stderrChunks).toString().trim();
-                reject(new Error(`wp db export failed (exit ${code}): ${msg || 'no output'}`));
+                reject(
+                  new Error(`wp db export failed (exit ${code}): ${msg || 'no output'}`),
+                );
               }
             });
           }),
@@ -74,10 +79,19 @@ export default function DbDump() {
       />
       {complete && ref.current.record && (
         <Box flexDirection="column" marginTop={1}>
-          <Text bold color="green">Backup created.</Text>
+          <Text bold color="green">
+            Backup created.
+          </Text>
           <Text> </Text>
-          <Text>ID: <Text bold color="cyan">{ref.current.record.id}</Text></Text>
-          <Text>File: <Text dimColor>{ref.current.record.filename}</Text></Text>
+          <Text>
+            ID:{' '}
+            <Text bold color="cyan">
+              {ref.current.record.id}
+            </Text>
+          </Text>
+          <Text>
+            File: <Text dimColor>{ref.current.record.filename}</Text>
+          </Text>
           <Text dimColor>Restore with: kiqr db restore {ref.current.record.id}</Text>
         </Box>
       )}

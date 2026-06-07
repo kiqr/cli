@@ -14,10 +14,7 @@ export function sanitizeHostname(raw: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export function buildProjectHostname(
-  projectSlug: string,
-  subdomain?: string,
-): string {
+export function buildProjectHostname(projectSlug: string, subdomain?: string): string {
   const machine = getMachineHostname();
   const base = `${projectSlug}.${machine}.lvh.me`;
   if (subdomain) {

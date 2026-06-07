@@ -1,14 +1,14 @@
-import {useState, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
+import fs from 'node:fs';
+import path from 'node:path';
 import {TextInput} from '@inkjs/ui';
-import StepRunner from '../components/StepRunner.js';
+import {Box, Text, useApp} from 'ink';
+import {useRef, useState} from 'react';
 import type {Step} from '../components/StepRunner.js';
-import {runDockerCompose} from '../lib/docker.js';
+import StepRunner from '../components/StepRunner.js';
 import {readProjectConfig} from '../lib/config.js';
+import {runDockerCompose} from '../lib/docker.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
 import {stopTraefikIfIdle} from '../lib/traefik.js';
-import path from 'node:path';
-import fs from 'node:fs';
 import type {ProjectConfig} from '../types/config.js';
 
 export const description = 'Stop and remove all site data (database, uploads, etc.)';
@@ -35,10 +35,19 @@ export default function Destroy() {
   if (!confirmed) {
     return (
       <Box flexDirection="column" paddingTop={1}>
-        <Text color="red" bold>This will permanently delete all site data.</Text>
-        <Text color="red">Database, uploads, plugins, and configuration will be lost.</Text>
+        <Text color="red" bold>
+          This will permanently delete all site data.
+        </Text>
+        <Text color="red">
+          Database, uploads, plugins, and configuration will be lost.
+        </Text>
         <Text> </Text>
-        <Text>To confirm, solve this: <Text bold color="yellow">What is {challenge.a} + {challenge.b}?</Text></Text>
+        <Text>
+          To confirm, solve this:{' '}
+          <Text bold color="yellow">
+            What is {challenge.a} + {challenge.b}?
+          </Text>
+        </Text>
         <Box marginTop={1}>
           {wrong && <Text color="red">Wrong answer. </Text>}
           <Text dimColor>Answer: </Text>
@@ -121,8 +130,12 @@ export default function Destroy() {
       />
       {complete && (
         <Box flexDirection="column" marginTop={1}>
-          <Text bold color="green">Project destroyed.</Text>
-          <Text dimColor>Run <Text bold>kiqr init</Text> to start fresh.</Text>
+          <Text bold color="green">
+            Project destroyed.
+          </Text>
+          <Text dimColor>
+            Run <Text bold>kiqr init</Text> to start fresh.
+          </Text>
         </Box>
       )}
     </Box>

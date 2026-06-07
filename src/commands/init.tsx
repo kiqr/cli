@@ -1,13 +1,17 @@
-import {useState, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
 import {randomUUID} from 'node:crypto';
-import StepRunner from '../components/StepRunner.js';
+import {Box, Text, useApp} from 'ink';
+import {useRef, useState} from 'react';
 import type {Step} from '../components/StepRunner.js';
+import StepRunner from '../components/StepRunner.js';
+import {
+  projectConfigExists,
+  writeLocalConfig,
+  writeProjectConfig,
+} from '../lib/config.js';
 import {isDockerInstalled, isDockerRunning} from '../lib/docker.js';
-import {detectTheme} from '../lib/theme.js';
-import {projectConfigExists, writeProjectConfig, writeLocalConfig} from '../lib/config.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
-import type {ProjectConfig, LocalConfig, ThemeInfo} from '../types/config.js';
+import {detectTheme} from '../lib/theme.js';
+import type {LocalConfig, ProjectConfig, ThemeInfo} from '../types/config.js';
 
 export const description = 'Initialize a new Kiqr project in the current directory';
 
@@ -101,11 +105,17 @@ export default function Init() {
       />
       {complete && (
         <Box flexDirection="column" marginTop={1}>
-          <Text bold color="green">Your project is ready!</Text>
+          <Text bold color="green">
+            Your project is ready!
+          </Text>
           <Text> </Text>
-          <Text>Theme: <Text bold>{themeName}</Text></Text>
+          <Text>
+            Theme: <Text bold>{themeName}</Text>
+          </Text>
           <Text> </Text>
-          <Text dimColor>Run <Text bold>kiqr up</Text> to start your site.</Text>
+          <Text dimColor>
+            Run <Text bold>kiqr up</Text> to start your site.
+          </Text>
         </Box>
       )}
     </Box>

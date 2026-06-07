@@ -1,9 +1,9 @@
-import {useEffect, useState} from 'react';
 import {Box, Text, useApp} from 'ink';
+import {useEffect, useState} from 'react';
+import type {BackupRecord} from '../../lib/backup-storage.js';
+import {createBackupStorage} from '../../lib/backup-storage.js';
 import {readProjectConfig} from '../../lib/config.js';
 import {getProjectBackupsDir} from '../../lib/paths.js';
-import {createBackupStorage} from '../../lib/backup-storage.js';
-import type {BackupRecord} from '../../lib/backup-storage.js';
 
 export const description = 'List available database backups';
 
@@ -15,7 +15,7 @@ function formatBytes(n: number): string {
 }
 
 function formatDate(d: Date): string {
-  return d.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+  return `${d.toISOString().replace('T', ' ').slice(0, 19)} UTC`;
 }
 
 function pad(s: string, width: number): string {
@@ -65,14 +65,15 @@ export default function DbList() {
   return (
     <Box flexDirection="column" paddingTop={1}>
       <Text bold>
-        {pad('id', idW)}  {pad('filename', fnW)}  {pad('size', szW)}  date
+        {pad('id', idW)} {pad('filename', fnW)} {pad('size', szW)} date
       </Text>
       <Text dimColor>
-        {'-'.repeat(idW)}  {'-'.repeat(fnW)}  {'-'.repeat(szW)}  {'-'.repeat(23)}
+        {'-'.repeat(idW)} {'-'.repeat(fnW)} {'-'.repeat(szW)} {'-'.repeat(23)}
       </Text>
       {rows.map((r) => (
         <Text key={r.id}>
-          <Text color="cyan">{pad(r.id, idW)}</Text>  {pad(r.filename, fnW)}  {pad(formatBytes(r.sizeBytes), szW)}  {formatDate(r.createdAt)}
+          <Text color="cyan">{pad(r.id, idW)}</Text> {pad(r.filename, fnW)}{' '}
+          {pad(formatBytes(r.sizeBytes), szW)} {formatDate(r.createdAt)}
         </Text>
       ))}
     </Box>

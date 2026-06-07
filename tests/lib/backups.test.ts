@@ -1,10 +1,10 @@
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {
-  encodeBackupId,
-  decodeBackupTimestamp,
-  buildBackupFilename,
-  parseBackupFilename,
   BACKUP_EXTENSION,
+  buildBackupFilename,
+  decodeBackupTimestamp,
+  encodeBackupId,
+  parseBackupFilename,
   SIDECAR_EXTENSION,
 } from '../../src/lib/backups.js';
 

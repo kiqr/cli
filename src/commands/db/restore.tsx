@@ -1,26 +1,26 @@
-import {useState, useRef} from 'react';
-import {Box, Text, useApp} from 'ink';
-import {ConfirmInput, TextInput} from '@inkjs/ui';
+import path from 'node:path';
 import {createGunzip, createGzip} from 'node:zlib';
-import zod from 'zod';
+import {ConfirmInput, TextInput} from '@inkjs/ui';
+import {Box, Text, useApp} from 'ink';
 import {argument} from 'pastel';
-import {readProjectConfig} from '../../lib/config.js';
-import {getProjectRuntimeDir, getProjectBackupsDir} from '../../lib/paths.js';
-import {getMachineHostname} from '../../lib/hostname.js';
+import {useRef, useState} from 'react';
+import zod from 'zod';
+import type {Step} from '../../components/StepRunner.js';
+import StepRunner from '../../components/StepRunner.js';
+import type {BackupRecord, BackupStorage} from '../../lib/backup-storage.js';
 import {createBackupStorage} from '../../lib/backup-storage.js';
 import {encodeBackupId} from '../../lib/backups.js';
-import {spawnWpCli, isWordPressInstalled} from '../../lib/wpcli.js';
-import StepRunner from '../../components/StepRunner.js';
-import type {Step} from '../../components/StepRunner.js';
-import type {BackupRecord, BackupStorage} from '../../lib/backup-storage.js';
-import path from 'node:path';
+import {readProjectConfig} from '../../lib/config.js';
+import {getMachineHostname} from '../../lib/hostname.js';
+import {getProjectBackupsDir, getProjectRuntimeDir} from '../../lib/paths.js';
+import {isWordPressInstalled, spawnWpCli} from '../../lib/wpcli.js';
 
 export const description = 'Restore the database from a backup';
 
 export const args = zod.tuple([
-  zod.string().describe(
-    argument({name: 'id', description: 'Backup id (from `kiqr db list`)'}),
-  ),
+  zod
+    .string()
+    .describe(argument({name: 'id', description: 'Backup id (from `kiqr db list`)'})),
 ]);
 
 type Props = {args: zod.infer<typeof args>};
@@ -59,14 +59,23 @@ async function runDump(
       child.on('error', reject);
       child.on('close', (code) => {
         if (code === 0) resolve();
-        else reject(new Error(`wp db export failed (exit ${code}): ${Buffer.concat(stderrChunks).toString().trim()}`));
+        else
+          reject(
+            new Error(
+              `wp db export failed (exit ${code}): ${Buffer.concat(stderrChunks).toString().trim()}`,
+            ),
+          );
       });
     }),
   ]);
   return record;
 }
 
-async function runRestore(composePath: string, record: BackupRecord, storage: BackupStorage): Promise<void> {
+async function runRestore(
+  composePath: string,
+  record: BackupRecord,
+  storage: BackupStorage,
+): Promise<void> {
   const child = spawnWpCli(composePath, ['wp', 'db', 'import', '-']);
   const stderrChunks: Buffer[] = [];
   child.stderr.on('data', (c: Buffer) => stderrChunks.push(c));
@@ -76,7 +85,12 @@ async function runRestore(composePath: string, record: BackupRecord, storage: Ba
     child.on('error', reject);
     child.on('close', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`wp db import failed (exit ${code}): ${Buffer.concat(stderrChunks).toString().trim()}`));
+      else
+        reject(
+          new Error(
+            `wp db import failed (exit ${code}): ${Buffer.concat(stderrChunks).toString().trim()}`,
+          ),
+        );
     });
   });
 }
@@ -123,7 +137,9 @@ export default function DbRestore({args}: Props) {
 
       const record = await storage.findById(args[0]);
       if (!record) {
-        setErrorMsg(`No backup with id "${args[0]}". Run "kiqr db list" to see available backups.`);
+        setErrorMsg(
+          `No backup with id "${args[0]}". Run "kiqr db list" to see available backups.`,
+        );
         setPhase('error');
         setTimeout(() => exit(new Error()), 100);
         return;
@@ -131,7 +147,8 @@ export default function DbRestore({args}: Props) {
       ref.current.record = record;
 
       const recent = await storage.mostRecent();
-      const hasRecent = recent && Date.now() - recent.createdAt.getTime() < FIVE_MINUTES_MS;
+      const hasRecent =
+        recent && Date.now() - recent.createdAt.getTime() < FIVE_MINUTES_MS;
       if (!hasRecent) {
         setPhase('ask-safety-backup');
       } else {
@@ -181,7 +198,12 @@ export default function DbRestore({args}: Props) {
           This will overwrite the current database with backup {ref.current.record!.id}.
         </Text>
         <Text> </Text>
-        <Text>To confirm, solve this: <Text bold color="yellow">What is {challenge.a} + {challenge.b}?</Text></Text>
+        <Text>
+          To confirm, solve this:{' '}
+          <Text bold color="yellow">
+            What is {challenge.a} + {challenge.b}?
+          </Text>
+        </Text>
         <Box marginTop={1}>
           {wrong && <Text color="red">Wrong answer. </Text>}
           <Text dimColor>Answer: </Text>
@@ -242,7 +264,11 @@ export default function DbRestore({args}: Props) {
       {
         label: `Restoring database from ${ref.current.record!.id}...`,
         run: async () => {
-          await runRestore(ref.current.composePath, ref.current.record!, ref.current.storage!);
+          await runRestore(
+            ref.current.composePath,
+            ref.current.record!,
+            ref.current.storage!,
+          );
         },
       },
     ];
@@ -263,7 +289,9 @@ export default function DbRestore({args}: Props) {
   // phase === 'done'
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text bold color="green">Database restored from {ref.current.record!.id}.</Text>
+      <Text bold color="green">
+        Database restored from {ref.current.record!.id}.
+      </Text>
       {ref.current.safetyRecord && (
         <Text dimColor>Safety backup saved as {ref.current.safetyRecord.id}.</Text>
       )}

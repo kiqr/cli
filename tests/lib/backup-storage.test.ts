@@ -1,13 +1,13 @@
-import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {Readable} from 'node:stream';
 import {createGzip} from 'node:zlib';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 import {
+  createBackupStorage,
   LocalBackupStorage,
   RemoteBackupStorage,
-  createBackupStorage,
 } from '../../src/lib/backup-storage.js';
 
 let tmp: string;
@@ -33,7 +33,9 @@ describe('LocalBackupStorage.save', () => {
     expect(record.filename).toBe('my-mbp-20260605-143012-abc12xy.sql.gz');
     expect(fs.existsSync(record.path)).toBe(true);
     expect(fs.existsSync(record.path.replace('.sql.gz', '.json'))).toBe(true);
-    const sidecar = JSON.parse(fs.readFileSync(record.path.replace('.sql.gz', '.json'), 'utf-8'));
+    const sidecar = JSON.parse(
+      fs.readFileSync(record.path.replace('.sql.gz', '.json'), 'utf-8'),
+    );
     expect(sidecar.id).toBe('abc12xy');
     expect(sidecar.projectId).toBe('proj-1');
     expect(sidecar.sha256).toMatch(/^[0-9a-f]{64}$/);

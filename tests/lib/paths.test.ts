@@ -1,5 +1,9 @@
-import {describe, it, expect, vi, beforeEach} from 'vitest';
-import {getKiqrDataDir, getProjectRuntimeDir, getProjectBackupsDir} from '../../src/lib/paths.js';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {
+  getKiqrDataDir,
+  getProjectBackupsDir,
+  getProjectRuntimeDir,
+} from '../../src/lib/paths.js';
 
 describe('getKiqrDataDir', () => {
   beforeEach(() => {
@@ -33,7 +37,9 @@ describe('getProjectRuntimeDir', () => {
   it('returns path under data dir with project id', () => {
     vi.stubEnv('HOME', '/Users/testuser');
     const result = getProjectRuntimeDir('abc-123', 'darwin');
-    expect(result).toBe('/Users/testuser/Library/Application Support/Kiqr/projects/abc-123');
+    expect(result).toBe(
+      '/Users/testuser/Library/Application Support/Kiqr/projects/abc-123',
+    );
   });
 });
 
