@@ -69,6 +69,7 @@ Theme Name: My Theme
 | `kiqr down` | Stop the development environment |
 | `kiqr restart` | Restart the development environment |
 | `kiqr init` | Initialize a new project |
+| `kiqr doctor` | Check your environment for common problems |
 | `kiqr info` | Show project info and credentials |
 | `kiqr open` | Open the site in your browser |
 | `kiqr open admin` | Open the WordPress dashboard (auto-login) |
