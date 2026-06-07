@@ -65,6 +65,8 @@ Theme Name: My Theme
 
 | Command | Description |
 |---------|-------------|
+| `kiqr scaffold theme <name>` | Scaffold a new WordPress theme (block by default) |
+| `kiqr scaffold theme <name> --type classic` | Scaffold a classic (PHP template) theme |
 | `kiqr up` | Start the development environment |
 | `kiqr down` | Stop the development environment |
 | `kiqr restart` | Restart the development environment |

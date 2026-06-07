@@ -15,6 +15,10 @@ export default function Index() {
       </Text>
       <Text>
         {' '}
+        <Text bold>kiqr scaffold</Text> Generate a new WordPress theme
+      </Text>
+      <Text>
+        {' '}
         <Text bold>kiqr init</Text> Initialize a new project
       </Text>
       <Text>
