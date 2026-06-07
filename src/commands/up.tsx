@@ -22,6 +22,7 @@ import {
   runDockerCompose,
 } from '../lib/docker.js';
 import {buildProjectHostname} from '../lib/hostname.js';
+import {validateWordPressPhp} from '../lib/image-tags.js';
 import {writeMuPlugin} from '../lib/mu-plugin.js';
 import {
   getProjectPluginsDir,
@@ -217,6 +218,19 @@ export default function Up() {
         if (lc.wordpress_version !== requestedVersion) {
           lc.wordpress_version = requestedVersion;
           writeLocalConfig(lc, ref.current.runtimeDir);
+        }
+      },
+    },
+    {
+      label: 'Validating WordPress + PHP version...',
+      run: async () => {
+        const pc = ref.current.projectConfig!;
+        const check = await validateWordPressPhp(
+          pc.wordpress.version,
+          pc.wordpress.php_version,
+        );
+        if (!check.ok) {
+          throw new Error(check.message);
         }
       },
     },
