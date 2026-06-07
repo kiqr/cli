@@ -8,7 +8,6 @@ import StepRunner from '../components/StepRunner.js';
 import {readProjectConfig} from '../lib/config.js';
 import {runDockerCompose} from '../lib/docker.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
-import {stopTraefikIfIdle} from '../lib/traefik.js';
 import type {ProjectConfig} from '../types/config.js';
 
 export const description = 'Stop and remove all site data (database, uploads, etc.)';
@@ -106,12 +105,6 @@ export default function Destroy() {
         if (fs.existsSync(kiqrYaml)) {
           fs.unlinkSync(kiqrYaml);
         }
-      },
-    },
-    {
-      label: 'Cleaning up...',
-      run: async () => {
-        stopTraefikIfIdle();
       },
     },
   ];

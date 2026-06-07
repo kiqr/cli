@@ -78,6 +78,11 @@ Theme Name: My Theme
 | `kiqr open uploads` | Open the uploads folder |
 | `kiqr logs` | Show WordPress logs |
 | `kiqr destroy` | Remove all site data and start fresh |
+| `kiqr agent start` | Start the kiqr agent (shared background service) |
+| `kiqr agent stop` | Stop the kiqr agent |
+| `kiqr agent restart` | Restart the kiqr agent |
+| `kiqr agent status` | Show whether the agent is running |
+| `kiqr agent logs` | Stream the agent container logs |
 
 ## Configuration
 
@@ -107,6 +112,22 @@ Kiqr runs WordPress, MariaDB, and phpMyAdmin in Docker containers, with [Traefik
 - **Plugins** are stored in a local directory (open with `kiqr open plugins`)
 
 Each developer on the team gets their own local hostname based on their computer name, so there are no port conflicts when working on the same network.
+
+### The kiqr agent
+
+The reverse proxy and the splash fallback page are managed together as the **kiqr agent** — a single, persistent background service shared by every project on your machine. The agent starts automatically on your first `kiqr up` and keeps running across projects (it uses Docker's `restart: unless-stopped` policy), so switching between themes no longer churns the proxy up and down.
+
+`kiqr down` and `kiqr destroy` only affect the current project; the agent keeps running. Manage it explicitly with:
+
+```bash
+kiqr agent status    # is it running?
+kiqr agent start     # start it
+kiqr agent stop      # stop it (e.g. to free the port)
+kiqr agent restart   # restart it
+kiqr agent logs      # stream its logs
+```
+
+The agent runs as the `kiqr-agent` Docker Compose project and is where future shared infrastructure (a dashboard, a mail catcher, the collaboration tunnel client) will live.
 
 ## License
 

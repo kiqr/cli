@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import type {RuntimeConfig} from '../providers/RuntimeProvider.js';
+import {KIQR_NETWORK} from './agent.js';
 import {createRuntimeProvider} from './runtime.js';
-import {KIQR_NETWORK} from './traefik.js';
 
 export function generateProjectCompose(
   config: RuntimeConfig,

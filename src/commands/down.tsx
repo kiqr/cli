@@ -6,7 +6,6 @@ import StepRunner from '../components/StepRunner.js';
 import {readProjectConfig} from '../lib/config.js';
 import {runDockerCompose} from '../lib/docker.js';
 import {getProjectRuntimeDir} from '../lib/paths.js';
-import {stopTraefikIfIdle} from '../lib/traefik.js';
 import type {ProjectConfig} from '../types/config.js';
 
 export const description = 'Stop the WordPress development environment';
@@ -36,12 +35,6 @@ export default function Down() {
         const runtimeDir = getProjectRuntimeDir(ref.current.projectConfig!.project_id);
         const composePath = path.join(runtimeDir, 'compose.yaml');
         runDockerCompose(composePath, 'down');
-      },
-    },
-    {
-      label: 'Cleaning up...',
-      run: async () => {
-        stopTraefikIfIdle();
       },
     },
   ];
