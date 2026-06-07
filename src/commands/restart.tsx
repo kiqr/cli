@@ -4,6 +4,7 @@ import {Box, Text, useApp} from 'ink';
 import {useRef, useState} from 'react';
 import type {Step} from '../components/StepRunner.js';
 import StepRunner from '../components/StepRunner.js';
+import {ensureAgentRunning} from '../lib/agent.js';
 import {writeProjectCompose} from '../lib/compose.js';
 import {readLocalConfig, readProjectConfig, writeLocalConfig} from '../lib/config.js';
 import {
@@ -20,7 +21,6 @@ import {
   getProjectUploadsDir,
 } from '../lib/paths.js';
 import {detectTheme} from '../lib/theme.js';
-import {ensureTraefikRunning} from '../lib/traefik.js';
 import type {LocalConfig, ProjectConfig} from '../types/config.js';
 
 export const description = 'Restart the WordPress development environment';
@@ -130,9 +130,9 @@ export default function Restart() {
       },
     },
     {
-      label: 'Starting reverse proxy...',
+      label: 'Starting kiqr agent...',
       run: async () => {
-        ensureTraefikRunning();
+        ensureAgentRunning();
       },
     },
     {

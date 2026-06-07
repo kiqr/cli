@@ -51,6 +51,10 @@ export default function Index() {
       </Text>
       <Text>
         {' '}
+        <Text bold>kiqr agent</Text> Manage the shared background service
+      </Text>
+      <Text>
+        {' '}
         <Text bold>kiqr logs</Text> Show WordPress logs
       </Text>
       <Text>
