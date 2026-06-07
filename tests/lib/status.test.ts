@@ -10,13 +10,6 @@ import {
 } from '../../src/lib/status.js';
 import type {ProjectConfig} from '../../src/types/config.js';
 
-// buildProjectHostname embeds the machine hostname; pin it so URL assertions
-// are deterministic regardless of the host the test runs on.
-vi.mock('node:os', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('node:os')>();
-  return {...actual, default: {...actual, hostname: () => 'testbox'}};
-});
-
 const PROJECT: ProjectConfig = {
   project_id: 'proj-123',
   name: 'acme',
@@ -78,9 +71,9 @@ describe('getProjectStatus', () => {
       {name: 'proj-123-phpmyadmin', running: true},
     ]);
     expect(status.urls).toEqual({
-      site: 'http://acme.testbox.lvh.me:5477',
-      admin: 'http://acme.testbox.lvh.me:5477/wp-admin',
-      phpmyadmin: 'http://phpmyadmin.acme.testbox.lvh.me:5477',
+      site: 'http://acme.lvh.me:5477',
+      admin: 'http://acme.lvh.me:5477/wp-admin',
+      phpmyadmin: 'http://phpmyadmin.acme.lvh.me:5477',
     });
   });
 
