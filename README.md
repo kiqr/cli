@@ -216,8 +216,8 @@ project_id: "a1b2c3d4-..."   # stable id; never changes even if you rename the f
 name: "my-glorious-theme"
 
 wordpress:
-  version: "latest"          # any valid WordPress Docker tag
-  php_version: "8.3"         # the PHP version to run WordPress on
+  version: 7                 # any valid WordPress Docker tag (e.g. 7, 6.4, or "latest")
+  php_version: 8.3           # the PHP version to run WordPress on
 
 development:
   dynamic_urls: true

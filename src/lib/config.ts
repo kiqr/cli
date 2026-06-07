@@ -7,12 +7,16 @@ import type {LocalConfig, ProjectConfig} from '../types/config.js';
 const PROJECT_CONFIG_FILE = 'kiqr.yaml';
 const LOCAL_CONFIG_FILE = 'config.yaml';
 
+// YAML parses bare numeric tokens (e.g. `version: 7`) as numbers. Coerce to
+// string so the version fields tolerate both quoted and unquoted forms.
+const versionString = z.coerce.string().min(1);
+
 const projectConfigSchema = z.object({
   project_id: z.string().min(1, 'project_id is required'),
   name: z.string().min(1, 'name is required'),
   wordpress: z.object({
-    version: z.string().min(1, 'wordpress.version is required'),
-    php_version: z.string().min(1, 'wordpress.php_version is required'),
+    version: versionString,
+    php_version: versionString,
   }),
   development: z.object({
     dynamic_urls: z.boolean(),
@@ -24,7 +28,7 @@ const localConfigSchema = z.object({
   runtime: z.string().min(1, 'runtime is required'),
   db_password: z.string().min(1, 'db_password is required'),
   login_secret: z.string().min(1, 'login_secret is required'),
-  wordpress_version: z.string().optional(),
+  wordpress_version: versionString.optional(),
   created_at: z.string().min(1, 'created_at is required'),
 }) satisfies z.ZodType<LocalConfig>;
 
