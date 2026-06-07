@@ -11,6 +11,7 @@ describe('generateProjectCompose', () => {
     hostname: 'my-theme.test.local',
     phpMyAdminHostname: 'phpmyadmin.my-theme.test.local',
     wordpressVersion: 'latest',
+    phpVersion: '8.3',
     dbPassword: 'test_password',
     loginSecret: 'secret123',
     muPluginPath: '/tmp/mu-plugin.php',
