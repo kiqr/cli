@@ -108,6 +108,7 @@ export default function Restart() {
             hostname,
             phpMyAdminHostname,
             wordpressVersion: pc.wordpress.version,
+            phpVersion: pc.wordpress.php_version,
             dbPassword: lc.db_password,
             loginSecret: lc.login_secret,
             muPluginPath,

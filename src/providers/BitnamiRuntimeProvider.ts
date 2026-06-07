@@ -8,9 +8,13 @@ import type {
 const KIQR_NETWORK = 'kiqr';
 
 export class BitnamiRuntimeProvider implements RuntimeProvider {
-  getWordPressImage(version: string, _phpVersion: string): string {
-    if (version === 'latest') return 'wordpress:latest';
-    return `wordpress:${version}`;
+  getWordPressImage(version: string, phpVersion: string): string {
+    // The official `wordpress` image publishes PHP-pinned tags:
+    //   - `wordpress:php8.3` for the latest WordPress on a given PHP version
+    //   - `wordpress:6.7-php8.3` for a specific WordPress + PHP combination
+    // See https://hub.docker.com/_/wordpress/tags
+    if (version === 'latest') return `wordpress:php${phpVersion}`;
+    return `wordpress:${version}-php${phpVersion}`;
   }
 
   getThemeMountTarget(themeSlug: string): string {
@@ -39,7 +43,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
 
     return {
       wordpress: {
-        image: this.getWordPressImage(config.wordpressVersion, '8.3'),
+        image: this.getWordPressImage(config.wordpressVersion, config.phpVersion),
         environment: {
           ...this.getEnvironmentVariables(credentials),
           KIQR_LOGIN_SECRET: config.loginSecret,
@@ -77,7 +81,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         restart: 'unless-stopped',
       },
       wpcli: {
-        image: 'wordpress:cli-php8.3',
+        image: `wordpress:cli-php${config.phpVersion}`,
         environment: {
           WORDPRESS_DB_HOST: 'mariadb',
           WORDPRESS_DB_NAME: credentials.dbName,
