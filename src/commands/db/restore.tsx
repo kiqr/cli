@@ -79,6 +79,10 @@ async function runRestore(
   const child = spawnWpCli(composePath, ['wp', 'db', 'import', '-']);
   const stderrChunks: Buffer[] = [];
   child.stderr.on('data', (c: Buffer) => stderrChunks.push(c));
+  // Drain stdout. We don't use its content (errors come from stderr), but if
+  // the child writes more than the OS pipe buffer (~64KB) and nothing reads
+  // it, the child blocks on write and the import deadlocks.
+  child.stdout.resume();
   const src = storage.openRead(record).pipe(createGunzip());
   src.pipe(child.stdin);
   await new Promise<void>((resolve, reject) => {
