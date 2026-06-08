@@ -1,3 +1,4 @@
+import {XDEBUG_DOCKERFILE} from '../lib/xdebug.js';
 import type {
   ComposeService,
   DatabaseCredentials,
@@ -58,9 +59,23 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
       dbPassword: config.dbPassword,
     };
 
+    const baseImage = this.getWordPressImage(config.wordpressVersion, config.phpVersion);
+
+    // When Xdebug is enabled we build a tiny image that layers the extension on
+    // top of the official `wordpress` image (which ships without Xdebug). The
+    // Dockerfile + ini are generated into the runtime dir by `writeXdebugAssets`
+    // before `kiqr up`/`restart` runs. `host.docker.internal` lets the debugger
+    // reach the IDE listening on the host machine.
+    const wordpressSource: Pick<ComposeService, 'image' | 'build'> = config.xdebugEnabled
+      ? {build: {context: config.dataDir, dockerfile: XDEBUG_DOCKERFILE}}
+      : {image: baseImage};
+    const wordpressExtraHosts = config.xdebugEnabled
+      ? [`${config.hostname}:host-gateway`, 'host.docker.internal:host-gateway']
+      : [`${config.hostname}:host-gateway`];
+
     return {
       wordpress: {
-        image: this.getWordPressImage(config.wordpressVersion, config.phpVersion),
+        ...wordpressSource,
         environment: {
           ...this.getEnvironmentVariables(credentials),
           KIQR_LOGIN_SECRET: config.loginSecret,
@@ -80,7 +95,7 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
           `traefik.http.routers.${config.projectSlug}-wp.entrypoints=web`,
           `traefik.http.services.${config.projectSlug}-wp.loadbalancer.server.port=80`,
         ],
-        extra_hosts: [`${config.hostname}:host-gateway`],
+        extra_hosts: wordpressExtraHosts,
         networks: [KIQR_NETWORK, 'default'],
         depends_on: ['mariadb'],
         restart: 'unless-stopped',

@@ -18,6 +18,7 @@ describe('generateProjectCompose', () => {
     pluginsPath: '/tmp/plugins',
     uploadsPath: '/tmp/uploads',
     dataDir: '/tmp/kiqr/projects/uuid',
+    xdebugEnabled: false,
   };
 
   it('generates valid YAML with all three services', () => {

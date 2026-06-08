@@ -26,5 +26,8 @@ export interface LocalConfig {
   db_password: string;
   login_secret: string;
   wordpress_version?: string;
+  // Whether Xdebug step-debugging is enabled. Machine-local because debugging
+  // is a per-developer choice. Absent means off (backward compatible).
+  xdebug?: boolean;
   created_at: string;
 }

@@ -1,5 +1,11 @@
+export interface ComposeBuild {
+  context: string;
+  dockerfile: string;
+}
+
 export interface ComposeService {
-  image: string;
+  image?: string;
+  build?: ComposeBuild;
   environment?: Record<string, string>;
   volumes?: string[];
   labels?: string[];
@@ -25,6 +31,7 @@ export interface RuntimeConfig {
   pluginsPath: string;
   uploadsPath: string;
   dataDir: string;
+  xdebugEnabled: boolean;
 }
 
 export interface DatabaseCredentials {

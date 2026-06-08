@@ -74,6 +74,7 @@ describe('BitnamiRuntimeProvider', () => {
       pluginsPath: '/tmp/plugins',
       uploadsPath: '/tmp/uploads',
       dataDir: '/tmp/kiqr/projects/uuid',
+      xdebugEnabled: false,
     });
     expect(services['wordpress']).toBeDefined();
     expect(services['mariadb']).toBeDefined();
@@ -98,8 +99,63 @@ describe('BitnamiRuntimeProvider', () => {
       pluginsPath: '/tmp/plugins',
       uploadsPath: '/tmp/uploads',
       dataDir: '/tmp/kiqr/projects/uuid',
+      xdebugEnabled: false,
     });
     expect(services['wordpress']!.image).toBe('wordpress:php8.4');
     expect(services['wpcli']!.image).toBe('wordpress:cli-php8.4');
+  });
+
+  const baseConfig = {
+    projectSlug: 'my-theme',
+    themePath: '/home/user/my-theme',
+    themeSlug: 'my-theme',
+    hostname: 'my-theme.test.lvh.me',
+    phpMyAdminHostname: 'phpmyadmin.my-theme.test.lvh.me',
+    wordpressVersion: 'latest',
+    phpVersion: '8.3',
+    dbPassword: 'test_password',
+    loginSecret: 'secret123',
+    muPluginPath: '/tmp/mu-plugin.php',
+    pluginsPath: '/tmp/plugins',
+    uploadsPath: '/tmp/uploads',
+    dataDir: '/tmp/kiqr/projects/uuid',
+  };
+
+  it('uses an image (not a build) and only the hostname extra_host when xdebug is off', () => {
+    const services = provider.generateComposeServices({
+      ...baseConfig,
+      xdebugEnabled: false,
+    });
+    const wp = services['wordpress']!;
+    expect(wp.image).toBe('wordpress:php8.3');
+    expect(wp.build).toBeUndefined();
+    expect(wp.extra_hosts).toEqual(['my-theme.test.lvh.me:host-gateway']);
+    expect(wp.extra_hosts).not.toContain('host.docker.internal:host-gateway');
+  });
+
+  it('builds from the generated Dockerfile and adds host.docker.internal when xdebug is on', () => {
+    const services = provider.generateComposeServices({
+      ...baseConfig,
+      xdebugEnabled: true,
+    });
+    const wp = services['wordpress']!;
+    expect(wp.image).toBeUndefined();
+    expect(wp.build).toEqual({
+      context: '/tmp/kiqr/projects/uuid',
+      dockerfile: 'xdebug.Dockerfile',
+    });
+    expect(wp.extra_hosts).toContain('my-theme.test.lvh.me:host-gateway');
+    expect(wp.extra_hosts).toContain('host.docker.internal:host-gateway');
+  });
+
+  it('leaves the other services unchanged when xdebug is on', () => {
+    const services = provider.generateComposeServices({
+      ...baseConfig,
+      xdebugEnabled: true,
+    });
+    expect(services['wpcli']!.image).toBe('wordpress:cli-php8.3');
+    expect(services['mariadb']!.image).toBe('mariadb:11.4');
+    expect(services['phpmyadmin']!.image).toBe('phpmyadmin:5.2');
+    expect(services['wpcli']!.build).toBeUndefined();
   });
 });

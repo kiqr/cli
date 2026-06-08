@@ -47,6 +47,10 @@ export default function Index() {
       </Text>
       <Text>
         {' '}
+        <Text bold>kiqr xdebug</Text> Toggle Xdebug step-debugging (on/off)
+      </Text>
+      <Text>
+        {' '}
         <Text bold>kiqr wp</Text> Run a WP-CLI command
       </Text>
       <Text>

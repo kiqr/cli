@@ -29,6 +29,7 @@ const localConfigSchema = z.object({
   db_password: z.string().min(1, 'db_password is required'),
   login_secret: z.string().min(1, 'login_secret is required'),
   wordpress_version: versionString.optional(),
+  xdebug: z.boolean().optional(),
   created_at: z.string().min(1, 'created_at is required'),
 }) satisfies z.ZodType<LocalConfig>;
 
