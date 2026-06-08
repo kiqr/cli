@@ -6,10 +6,12 @@ import {isContainerRunning} from '../lib/docker.js';
 import {buildProjectHostname} from '../lib/hostname.js';
 import {
   buildCloudflaredArgs,
+  clearShareUrlFromContainer,
   cloudflaredInstallHint,
   isCloudflaredInstalled,
   parseTunnelUrl,
   TRAEFIK_BASE_URL,
+  writeShareUrlToContainer,
 } from '../lib/share.js';
 import {containerNameFor} from '../lib/status.js';
 
@@ -61,10 +63,26 @@ export default function Share() {
       const text = chunk.toString();
       for (const line of text.split('\n')) {
         const url = parseTunnelUrl(line);
-        if (url) {
+        if (url && !foundUrlRef.current) {
           foundUrlRef.current = true;
           setPublicUrl(url);
           setStarting(false);
+          // Plumb the public URL into the container so WordPress can build
+          // absolute URLs against it. Cloudflared rewrites Host (for Traefik
+          // routing) and doesn't pass the original anywhere downstream, so we
+          // hand it over out-of-band. See SHARE_URL_CONTAINER_PATH.
+          //
+          // Surface failures: silently swallowing them once meant the user
+          // saw the tunnel URL but every WP-generated link still pointed at
+          // the local hostname.
+          writeShareUrlToContainer(pc.project_id, url, undefined, (err) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            // eslint-disable-next-line no-console
+            console.error(
+              `Warning: could not plumb the tunnel URL into the WordPress container: ${msg}.\n` +
+                `Tunnel will still work for static assets, but WP-generated links may point at the local hostname.`,
+            );
+          });
         }
       }
     };
@@ -78,6 +96,11 @@ export default function Share() {
 
     child.on('exit', (code) => {
       childRef.current = null;
+      // Best-effort: leaving the marker file behind is harmless on the next
+      // direct-local request (mu-plugin only honors it for Cloudflare-tagged
+      // requests), but cleanup keeps things tidy if the container outlives
+      // this session.
+      if (foundUrlRef.current) clearShareUrlFromContainer(pc.project_id);
       if (code && code !== 0 && !foundUrlRef.current) {
         setError(`cloudflared exited with code ${code}.`);
         return;
@@ -86,6 +109,7 @@ export default function Share() {
     });
 
     return () => {
+      if (foundUrlRef.current) clearShareUrlFromContainer(pc.project_id);
       childRef.current?.kill('SIGINT');
       childRef.current = null;
     };

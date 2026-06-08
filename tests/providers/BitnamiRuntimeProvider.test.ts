@@ -42,14 +42,37 @@ describe('BitnamiRuntimeProvider', () => {
     });
     const extra = env['WORDPRESS_CONFIG_EXTRA']!;
 
-    // Prefers the public host forwarded by the tunnel, then falls back to the
-    // local Host header for normal requests (unchanged local behavior).
+    // Honors the public hostname carried out-of-band via /tmp/kiqr-share-url
+    // when `kiqr share` is active, gated on X-Forwarded-Proto: https so
+    // direct-local browsing during a share session still gets local URLs.
+    // Cloudflared rewrites Host (for Traefik routing) and doesn't pass the
+    // original anywhere downstream, so forwarded headers alone can't reveal
+    // the public hostname.
+    expect(extra).toContain("'/tmp/kiqr-share-url'");
+    expect(extra).toContain('is_readable(');
+    expect(extra).toContain('parse_url(');
+    // Must rewrite HTTP_HOST when the share URL is in effect, otherwise
+    // WordPress's canonical-URL guard sees Host=local + WP_HOME=tunnel and
+    // 301-redirects into an infinite loop.
+    expect(extra).toContain("$$_SERVER['HTTP_HOST'] = $$host");
+    // Falls back to X-Forwarded-Host / -Proto (Traefik trustedIPs preserves
+    // them for reverse-proxy setups other than the tunnel).
     expect(extra).toContain("$$_SERVER['HTTP_X_FORWARDED_HOST']");
     expect(extra).toContain("$$_SERVER['HTTP_HOST']");
-    // Honors the forwarded scheme so tunneled (https) requests generate https
-    // URLs, defaulting to http locally.
     expect(extra).toContain("$$_SERVER['HTTP_X_FORWARDED_PROTO']");
     expect(extra).toContain("=== 'https'");
+    // Defensive parsing of forwarded headers: comma-split for chained proxies,
+    // trim whitespace, lowercase the scheme.
+    expect(extra).toContain("explode(',', $$_SERVER['HTTP_X_FORWARDED_HOST'])");
+    expect(extra).toContain("explode(',', $$_SERVER['HTTP_X_FORWARDED_PROTO'])");
+    expect(extra).toContain('strtolower(');
+    expect(extra).toContain('trim(');
+    // Forge `$_SERVER['HTTPS']` and `SERVER_PORT` so WordPress's `is_ssl()`
+    // returns true behind a TLS-terminating proxy -- without this, themes and
+    // plugins that branch on is_ssl() emit http:// URLs and the browser mixed-
+    // content-blocks CSS / images on the tunneled https page.
+    expect(extra).toContain("$$_SERVER['HTTPS'] = 'on'");
+    expect(extra).toContain("$$_SERVER['SERVER_PORT'] = 443");
     // Still defines both URL constants and keeps the kiqr dev flag.
     expect(extra).toContain("define('WP_HOME'");
     expect(extra).toContain("define('WP_SITEURL'");
@@ -71,6 +94,7 @@ describe('BitnamiRuntimeProvider', () => {
       dbPassword: 'test_password',
       loginSecret: 'secret123',
       muPluginPath: '/tmp/mu-plugin.php',
+      apacheConfPath: '/tmp/kiqr-apache.conf',
       pluginsPath: '/tmp/plugins',
       uploadsPath: '/tmp/uploads',
       dataDir: '/tmp/kiqr/projects/uuid',
@@ -95,11 +119,39 @@ describe('BitnamiRuntimeProvider', () => {
       dbPassword: 'test_password',
       loginSecret: 'secret123',
       muPluginPath: '/tmp/mu-plugin.php',
+      apacheConfPath: '/tmp/kiqr-apache.conf',
       pluginsPath: '/tmp/plugins',
       uploadsPath: '/tmp/uploads',
       dataDir: '/tmp/kiqr/projects/uuid',
     });
     expect(services['wordpress']!.image).toBe('wordpress:php8.4');
     expect(services['wpcli']!.image).toBe('wordpress:cli-php8.4');
+  });
+
+  it('mounts the kiqr apache conf so mod_dir DirectorySlash plays nice with the tunnel', () => {
+    // Without this overlay, Apache's mod_dir 301s tunneled `/wp-admin` to
+    // http://<local-Host>/wp-admin/ -- a dead URL behind the https tunnel.
+    const services = provider.generateComposeServices({
+      projectSlug: 'my-theme',
+      themePath: '/home/user/my-theme',
+      themeSlug: 'my-theme',
+      hostname: 'my-theme.lvh.me',
+      phpMyAdminHostname: 'phpmyadmin.my-theme.lvh.me',
+      wordpressVersion: 'latest',
+      phpVersion: '8.3',
+      dbPassword: 'test_password',
+      loginSecret: 'secret123',
+      muPluginPath: '/tmp/mu-plugin.php',
+      apacheConfPath: '/tmp/kiqr-apache.conf',
+      pluginsPath: '/tmp/plugins',
+      uploadsPath: '/tmp/uploads',
+      dataDir: '/tmp/kiqr/projects/uuid',
+    });
+    const volumes = services['wordpress']!.volumes!;
+    expect(
+      volumes.some((v) =>
+        v.startsWith('/tmp/kiqr-apache.conf:/etc/apache2/conf-enabled/'),
+      ),
+    ).toBe(true);
   });
 });

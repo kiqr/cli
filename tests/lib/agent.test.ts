@@ -51,6 +51,23 @@ describe('generateAgentCompose', () => {
     expect(volumes.some((v: string) => v.includes('docker.sock'))).toBe(true);
   });
 
+  it('trusts X-Forwarded-* headers from any peer (dev-mode escape hatch)', () => {
+    // Cloudflared (`kiqr share`) connects from the host via Docker port
+    // publishing; on Docker Desktop for Mac/Windows the NAT'd source IP
+    // doesn't always fall in the expected RFC1918 range, so a CIDR-based
+    // trustedIPs list misses it and Traefik clobbers the forwarded headers,
+    // breaking the https-tunnel handoff. Since the agent is a single-user
+    // local dev tool, accept all peers.
+    const yaml = generateAgentCompose('/tmp/kiqr/agent');
+    const parsed = YAML.parse(yaml);
+    const command = parsed.services.traefik.command as string[];
+    expect(
+      command.some(
+        (c) => c === '--entrypoints.web.forwardedHeaders.insecure=true',
+      ),
+    ).toBe(true);
+  });
+
   it('includes splash page container with lowest priority', () => {
     const yaml = generateAgentCompose('/tmp/kiqr/agent');
     const parsed = YAML.parse(yaml);

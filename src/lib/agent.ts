@@ -54,6 +54,20 @@ export function generateAgentCompose(agentDir: string): string {
           `--providers.docker.network=${KIQR_NETWORK}`,
           `--entrypoints.web.address=:${AGENT_PORT}`,
           '--api.insecure=true',
+          // Trust X-Forwarded-* headers from ANY peer. Without this, Traefik
+          // rewrites incoming X-Forwarded-Proto and X-Forwarded-Host to its
+          // own values, so `kiqr share` (cloudflared → localhost → Traefik
+          // via Docker port mapping) loses the original https scheme and the
+          // WordPress mu-plugin can't tell the request came over https.
+          //
+          // We use `insecure=true` instead of an `trustedIPs` CIDR list
+          // because Docker Desktop for macOS/Windows NATs host→container
+          // traffic through its VM, and the source IP Traefik observes
+          // doesn't always land in the expected RFC1918 range. Since the
+          // kiqr agent is a single-user local dev tool and Traefik listens
+          // only on the host, the risk of an outside peer spoofing
+          // X-Forwarded-* is bounded to the developer's own machine.
+          '--entrypoints.web.forwardedHeaders.insecure=true',
         ],
         ports: [`${AGENT_PORT}:${AGENT_PORT}`],
         volumes: ['/var/run/docker.sock:/var/run/docker.sock:ro'],

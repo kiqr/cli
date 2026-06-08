@@ -16,6 +16,7 @@ import {
 import {buildProjectHostname} from '../lib/hostname.js';
 import {validateWordPressPhp} from '../lib/image-tags.js';
 import {writeMuPlugin} from '../lib/mu-plugin.js';
+import {writeApacheConf} from '../lib/apache-conf.js';
 import {
   getProjectPluginsDir,
   getProjectRuntimeDir,
@@ -102,6 +103,7 @@ export default function Restart() {
         const hostname = buildProjectHostname(pc.name);
         const phpMyAdminHostname = buildProjectHostname(pc.name, 'phpmyadmin');
         const muPluginPath = writeMuPlugin(ref.current.runtimeDir);
+        const apacheConfPath = writeApacheConf(ref.current.runtimeDir);
         const pluginsPath = getProjectPluginsDir(pc.project_id);
         const uploadsPath = getProjectUploadsDir(pc.project_id);
         fs.mkdirSync(pluginsPath, {recursive: true});
@@ -122,6 +124,7 @@ export default function Restart() {
             dbPassword: lc.db_password,
             loginSecret: lc.login_secret,
             muPluginPath,
+            apacheConfPath,
             pluginsPath,
             uploadsPath,
             dataDir: ref.current.runtimeDir,

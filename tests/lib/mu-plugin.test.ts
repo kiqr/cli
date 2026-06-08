@@ -85,6 +85,42 @@ describe('writeMuPlugin', () => {
     expect(content).toContain("if (!$lr_port) $lr_port = '35729'");
   });
 
+  it('suppresses the LiveReload script tag on forwarded (tunneled) requests', () => {
+    // The script src points at the host's localhost, unreachable from a
+    // remote viewer over `kiqr share`, and would mixed-content-block on the
+    // https tunnel page. Skip on any request that carries X-Forwarded-Host.
+    const content = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
+    expect(content).toContain("if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) return;");
+  });
+
+  it('disables canonical-URL redirects to avoid redirect loops behind a reverse proxy', () => {
+    // Behind cloudflared --http-host-header, WP's redirect_canonical and
+    // Yoast SEO's redirector can disagree about the canonical URL and emit
+    // 301s that point right back at themselves through the proxy, producing
+    // ERR_TOO_MANY_REDIRECTS in the browser. Canonical enforcement is a
+    // production concern; in dev we want pages to render wherever requested.
+    const content = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
+    expect(content).toContain("remove_filter('template_redirect', 'redirect_canonical')");
+    expect(content).toContain("WPSEO_Frontend");
+  });
+
+  it('rewrites absolute production URLs in the response body to the current dynamic URL', () => {
+    // A restored production DB still has absolute `https://prod.example.com/...`
+    // URLs cached in postmeta / serialized options. ob_start in the mu-plugin
+    // translates them to whatever URL the request came in on.
+    const content = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
+    expect(content).toContain("add_action('muplugins_loaded'");
+    expect(content).toContain('ob_start(');
+    // Reads the RAW DB option (not get_option which returns the WP_HOME
+    // constant) so we can rewrite the stale stored value.
+    expect(content).toContain('SELECT option_value FROM');
+    expect(content).toContain("option_name IN ('siteurl', 'home')");
+    // Replaces stored URLs with the dynamic WP_HOME constant.
+    expect(content).toContain('str_replace($patterns, WP_HOME, $buf)');
+    // Bails out on binary responses (images served via PHP, downloads, etc.).
+    expect(content).toContain('Content-Type:');
+  });
+
   it('is deterministic across writes', () => {
     const first = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
     const second = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');

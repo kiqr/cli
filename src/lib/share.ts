@@ -2,6 +2,40 @@ import {execSync} from 'node:child_process';
 import {AGENT_PORT} from './agent.js';
 
 /**
+ * Path inside the WordPress container where `kiqr share` drops the active
+ * tunnel URL while sharing. The mu-plugin's WORDPRESS_CONFIG_EXTRA reads this
+ * file to learn the public hostname/scheme -- cloudflared's quick tunnels
+ * don't carry the original Host through to the origin, so we plumb it here
+ * out-of-band instead. Lives under `/tmp` so it disappears on container
+ * recreate (a fresh `kiqr restart` while sharing legitimately invalidates it).
+ */
+export const SHARE_URL_CONTAINER_PATH = '/tmp/kiqr-share-url';
+
+/**
+ * Look up the running container ID for a project + service via docker compose
+ * labels. Returns `null` if no container matches (not running, wrong project,
+ * etc.). We resolve by labels rather than name because docker-compose appends
+ * a replica suffix (`-1`) to its container names; assuming a fixed suffix
+ * silently breaks the moment compose changes its naming convention.
+ */
+export function resolveProjectContainerId(
+  projectId: string,
+  service: string,
+  exec: (cmd: string) => string = (cmd) =>
+    execSync(cmd, {stdio: 'pipe'}).toString(),
+): string | null {
+  try {
+    const out = exec(
+      `docker ps -q --filter "label=com.docker.compose.project=${projectId}" --filter "label=com.docker.compose.service=${service}"`,
+    );
+    const id = out.trim().split('\n')[0]?.trim() ?? '';
+    return id || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * `kiqr share` exposes the developer's running local WordPress site at a public
  * URL through a Cloudflare "quick tunnel" -- an instant, account-less tunnel
  * provided by the external `cloudflared` binary.
@@ -65,6 +99,62 @@ const TUNNEL_URL_PATTERN = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/i;
 export function parseTunnelUrl(line: string): string | null {
   const match = line.match(TUNNEL_URL_PATTERN);
   return match ? match[0] : null;
+}
+
+/**
+ * Write the active tunnel URL into the running WordPress container so the
+ * mu-plugin can pick it up for the current request. Best-effort: a failure
+ * (container gone, docker socket missing) is reported via the caller's
+ * `onError`, never thrown -- the tunnel still works for direct browsing.
+ *
+ * Resolves the actual docker container ID via labels rather than constructing
+ * a name string; docker-compose's replica-suffix convention has bitten this
+ * code path once already.
+ */
+export function writeShareUrlToContainer(
+  projectId: string,
+  url: string,
+  exec: Exec = defaultExec,
+  onError?: (err: unknown) => void,
+): void {
+  // Shell-safe: only allow [A-Za-z0-9:/._-] in the URL. Quick-tunnel URLs
+  // always match this; reject anything else rather than risk injecting into
+  // the `sh -c` argument.
+  if (!/^[A-Za-z0-9:/._-]+$/.test(url)) {
+    onError?.(new Error(`Refusing to write malformed share URL: ${url}`));
+    return;
+  }
+  const id = resolveProjectContainerId(projectId, 'wordpress');
+  if (!id) {
+    onError?.(new Error(`Could not resolve WordPress container for project ${projectId}`));
+    return;
+  }
+  try {
+    exec(
+      `docker exec ${id} sh -c 'printf %s ${url} > ${SHARE_URL_CONTAINER_PATH}'`,
+    );
+  } catch (err) {
+    onError?.(err);
+  }
+}
+
+/**
+ * Remove the tunnel-URL marker file from the WordPress container. Called on
+ * tunnel exit so subsequent requests don't keep masquerading as tunneled.
+ * Best-effort, same rationale as {@link writeShareUrlToContainer}.
+ */
+export function clearShareUrlFromContainer(
+  projectId: string,
+  exec: Exec = defaultExec,
+  onError?: (err: unknown) => void,
+): void {
+  const id = resolveProjectContainerId(projectId, 'wordpress');
+  if (!id) return; // container already gone -- nothing to clean
+  try {
+    exec(`docker exec ${id} rm -f ${SHARE_URL_CONTAINER_PATH}`);
+  } catch (err) {
+    onError?.(err);
+  }
 }
 
 /**
