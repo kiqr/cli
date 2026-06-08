@@ -25,6 +25,7 @@ export const args = zod.tuple([
           '  wp, wordpress, web        Open the site\n' +
           '  admin, wpadmin, dashboard  Open the WordPress dashboard (auto-login)\n' +
           '  phpmyadmin, pma            Open phpMyAdmin (auto-login)\n' +
+          '  mail, mailpit              Open the Mailpit email catcher\n' +
           '  plugins                    Open the plugins folder\n' +
           '  uploads, media             Open the uploads folder\n' +
           '  data                       Open the Kiqr project data folder',
@@ -42,6 +43,8 @@ const ALIASES: Record<string, string> = {
   web: 'wp',
   phpmyadmin: 'phpmyadmin',
   pma: 'phpmyadmin',
+  mail: 'mail',
+  mailpit: 'mail',
   admin: 'admin',
   wpadmin: 'admin',
   dashboard: 'admin',
@@ -109,6 +112,11 @@ export default function Open({args}: Props) {
           break;
         case 'phpmyadmin':
           openTarget(`http://${phpMyAdminHostname}:5477`);
+          break;
+        case 'mail':
+          // Mailpit is an agent-level service shared by every project, reached
+          // at a fixed host rather than a per-project hostname.
+          openTarget('http://mail.lvh.me:5477');
           break;
         case 'admin':
           if (lc?.login_secret) {

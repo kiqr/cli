@@ -76,6 +76,19 @@ add_action('init', function () {
     }
 }, 0);
 
+// Route all outgoing mail to the kiqr agent's Mailpit catcher over SMTP.
+// The WordPress container shares the kiqr network, so it resolves the
+// "kiqr-mailpit" container by name. Mailpit accepts unauthenticated,
+// unencrypted SMTP on port 1025.
+add_action('phpmailer_init', function ($phpmailer) {
+    $phpmailer->isSMTP();
+    $phpmailer->Host = 'kiqr-mailpit';
+    $phpmailer->Port = 1025;
+    $phpmailer->SMTPAuth = false;
+    $phpmailer->SMTPSecure = '';
+    $phpmailer->SMTPAutoTLS = false;
+});
+
 // Inject LiveReload script in development.
 //
 // The script src points at http://localhost on the host machine, which is only
