@@ -10,7 +10,7 @@ Kiqr is the deal: you stay in your theme repo, run one command, and a real WordP
 cd my-glorious-theme
 kiqr up
 # ☕ ...a few seconds later...
-# → http://my-glorious-theme.your-laptop.lvh.me:5477
+# → http://my-glorious-theme.lvh.me:5477
 ```
 
 That's the whole pitch. Keep reading and we'll prove it.
