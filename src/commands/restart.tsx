@@ -21,7 +21,9 @@ import {
   getProjectRuntimeDir,
   getProjectUploadsDir,
 } from '../lib/paths.js';
+import {createRuntimeProvider} from '../lib/runtime.js';
 import {detectTheme} from '../lib/theme.js';
+import {removeXdebugAssets, writeXdebugAssets} from '../lib/xdebug.js';
 import type {LocalConfig, ProjectConfig} from '../types/config.js';
 
 export const description = 'Restart the WordPress development environment';
@@ -110,6 +112,18 @@ export default function Restart() {
         setSiteUrl(`http://${hostname}:5477`);
         setPmaUrl(`http://${phpMyAdminHostname}:5477`);
 
+        const xdebugEnabled = lc.xdebug === true;
+        if (xdebugEnabled) {
+          const provider = createRuntimeProvider(lc.runtime);
+          const baseImage = provider.getWordPressImage(
+            pc.wordpress.version,
+            pc.wordpress.php_version,
+          );
+          writeXdebugAssets(ref.current.runtimeDir, baseImage);
+        } else {
+          removeXdebugAssets(ref.current.runtimeDir);
+        }
+
         writeProjectCompose(
           {
             projectSlug: pc.name,
@@ -125,6 +139,7 @@ export default function Restart() {
             pluginsPath,
             uploadsPath,
             dataDir: ref.current.runtimeDir,
+            xdebugEnabled,
           },
           ref.current.runtimeDir,
         );

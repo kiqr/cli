@@ -109,4 +109,47 @@ describe('local config', () => {
     expect(() => readLocalConfig(tmpDir)).toThrow(/config\.yaml is invalid/);
     expect(() => readLocalConfig(tmpDir)).toThrow(/db_password/);
   });
+
+  it('treats xdebug as optional (backward compatible) and defaults to absent', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'config.yaml'),
+      'project_id: test-uuid\n' +
+        'runtime: bitnami\n' +
+        'db_password: testpassword123456789012\n' +
+        'login_secret: testsecret1234567890\n' +
+        'created_at: 2026-05-29T00:00:00Z\n',
+      'utf-8',
+    );
+    const loaded = readLocalConfig(tmpDir);
+    expect(loaded).not.toBeNull();
+    expect(loaded?.xdebug).toBeUndefined();
+  });
+
+  it('round-trips the xdebug flag when set', () => {
+    const config: LocalConfig = {
+      project_id: 'test-uuid',
+      runtime: 'bitnami',
+      db_password: 'testpassword123456789012',
+      login_secret: 'testsecret1234567890',
+      xdebug: true,
+      created_at: '2026-05-29T00:00:00Z',
+    };
+    writeLocalConfig(config, tmpDir);
+    expect(readLocalConfig(tmpDir)?.xdebug).toBe(true);
+  });
+
+  it('rejects a non-boolean xdebug value', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'config.yaml'),
+      'project_id: test-uuid\n' +
+        'runtime: bitnami\n' +
+        'db_password: testpassword123456789012\n' +
+        'login_secret: testsecret1234567890\n' +
+        'xdebug: maybe\n' +
+        'created_at: 2026-05-29T00:00:00Z\n',
+      'utf-8',
+    );
+    expect(() => readLocalConfig(tmpDir)).toThrow(/config\.yaml is invalid/);
+    expect(() => readLocalConfig(tmpDir)).toThrow(/xdebug/);
+  });
 });
