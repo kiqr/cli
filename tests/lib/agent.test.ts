@@ -62,9 +62,7 @@ describe('generateAgentCompose', () => {
     const parsed = YAML.parse(yaml);
     const command = parsed.services.traefik.command as string[];
     expect(
-      command.some(
-        (c) => c === '--entrypoints.web.forwardedHeaders.insecure=true',
-      ),
+      command.some((c) => c === '--entrypoints.web.forwardedHeaders.insecure=true'),
     ).toBe(true);
   });
 
@@ -75,6 +73,30 @@ describe('generateAgentCompose', () => {
     expect(parsed.services.splash.image).toBe('nginx:1.30-alpine');
     const labels = parsed.services.splash.labels;
     expect(labels.some((l: string) => l.includes('priority=1'))).toBe(true);
+  });
+
+  it('includes the Mailpit email catcher with a pinned image', () => {
+    const yaml = generateAgentCompose('/tmp/kiqr/agent');
+    const parsed = YAML.parse(yaml);
+    expect(parsed.services.mailpit).toBeDefined();
+    expect(parsed.services.mailpit.image).toBe('axllent/mailpit:v1.30.1');
+    expect(parsed.services.mailpit.container_name).toBe('kiqr-mailpit');
+    expect(parsed.services.mailpit.networks).toContain('kiqr');
+    expect(parsed.services.mailpit.restart).toBe('unless-stopped');
+  });
+
+  it('routes mail.lvh.me to the Mailpit web UI on port 8025', () => {
+    const yaml = generateAgentCompose('/tmp/kiqr/agent');
+    const parsed = YAML.parse(yaml);
+    const labels: string[] = parsed.services.mailpit.labels;
+    expect(labels).toContain('traefik.enable=true');
+    expect(labels).toContain(
+      'traefik.http.routers.kiqr-mailpit.rule=Host(`mail.lvh.me`)',
+    );
+    expect(labels).toContain('traefik.http.routers.kiqr-mailpit.entrypoints=web');
+    expect(labels).toContain(
+      'traefik.http.services.kiqr-mailpit.loadbalancer.server.port=8025',
+    );
   });
 });
 

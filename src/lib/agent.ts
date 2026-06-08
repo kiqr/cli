@@ -26,10 +26,19 @@ export const KIQR_NETWORK = 'kiqr';
 export const AGENT_PROJECT = 'kiqr-agent';
 export const AGENT_PORT = 5477;
 
-export const AGENT_CONTAINERS = ['kiqr-traefik', 'kiqr-splash'] as const;
+export const AGENT_CONTAINERS = ['kiqr-traefik', 'kiqr-splash', 'kiqr-mailpit'] as const;
 
 const TRAEFIK_CONTAINER = 'kiqr-traefik';
 const SPLASH_CONTAINER = 'kiqr-splash';
+const MAILPIT_CONTAINER = 'kiqr-mailpit';
+
+/**
+ * Mailpit catches every outgoing email from any kiqr project (WordPress is
+ * pointed at it over SMTP via the per-project mu-plugin) and exposes a web UI
+ * at `mail.lvh.me`. It listens for SMTP on 1025 and serves its web UI on 8025.
+ */
+const MAILPIT_HOST = 'mail.lvh.me';
+const MAILPIT_WEB_PORT = 8025;
 
 export interface AgentStatus {
   running: boolean;
@@ -87,6 +96,18 @@ export function generateAgentCompose(agentDir: string): string {
           'traefik.http.routers.kiqr-splash.entrypoints=web',
           'traefik.http.routers.kiqr-splash.priority=1',
           'traefik.http.services.kiqr-splash.loadbalancer.server.port=80',
+        ],
+        networks: [KIQR_NETWORK],
+        restart: 'unless-stopped',
+      },
+      mailpit: {
+        image: 'axllent/mailpit:v1.30.1',
+        container_name: MAILPIT_CONTAINER,
+        labels: [
+          'traefik.enable=true',
+          `traefik.http.routers.kiqr-mailpit.rule=Host(\`${MAILPIT_HOST}\`)`,
+          'traefik.http.routers.kiqr-mailpit.entrypoints=web',
+          `traefik.http.services.kiqr-mailpit.loadbalancer.server.port=${MAILPIT_WEB_PORT}`,
         ],
         networks: [KIQR_NETWORK],
         restart: 'unless-stopped',

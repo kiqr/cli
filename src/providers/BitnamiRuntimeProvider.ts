@@ -81,15 +81,15 @@ export class BitnamiRuntimeProvider implements RuntimeProvider {
         "$$fwd_host = !empty($$_SERVER['HTTP_X_FORWARDED_HOST']) ? trim(explode(',', $$_SERVER['HTTP_X_FORWARDED_HOST'])[0]) : ''; " +
         "$$fwd_proto = !empty($$_SERVER['HTTP_X_FORWARDED_PROTO']) ? strtolower(trim(explode(',', $$_SERVER['HTTP_X_FORWARDED_PROTO'])[0])) : ''; " +
         "$$share_url = ($$fwd_proto === 'https' && is_readable('/tmp/kiqr-share-url')) ? trim(@file_get_contents('/tmp/kiqr-share-url')) : ''; " +
-        "$$share_parts = $$share_url ? parse_url($$share_url) : false; " +
+        '$$share_parts = $$share_url ? parse_url($$share_url) : false; ' +
         "if (is_array($$share_parts) && !empty($$share_parts['host'])) { " +
         "  $$host = $$share_parts['host']; " +
         "  $$proto = strtolower($$share_parts['scheme'] ?? 'https'); " +
         "  $$_SERVER['HTTP_HOST'] = $$host; " +
-        "} else { " +
+        '} else { ' +
         "  $$host = $$fwd_host ?: ($$_SERVER['HTTP_HOST'] ?? 'localhost'); " +
         "  $$proto = ($$fwd_proto === 'https') ? 'https' : 'http'; " +
-        "} " +
+        '} ' +
         "if ($$proto === 'https') { $$_SERVER['HTTPS'] = 'on'; $$_SERVER['SERVER_PORT'] = 443; } " +
         "define('WP_HOME', $$proto . '://' . $$host); " +
         "define('WP_SITEURL', $$proto . '://' . $$host);",

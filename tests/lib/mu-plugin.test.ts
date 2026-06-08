@@ -101,7 +101,7 @@ describe('writeMuPlugin', () => {
     // production concern; in dev we want pages to render wherever requested.
     const content = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
     expect(content).toContain("remove_filter('template_redirect', 'redirect_canonical')");
-    expect(content).toContain("WPSEO_Frontend");
+    expect(content).toContain('WPSEO_Frontend');
   });
 
   it('rewrites absolute production URLs in the response body to the current dynamic URL', () => {
@@ -119,6 +119,15 @@ describe('writeMuPlugin', () => {
     expect(content).toContain('str_replace($patterns, WP_HOME, $buf)');
     // Bails out on binary responses (images served via PHP, downloads, etc.).
     expect(content).toContain('Content-Type:');
+  });
+
+  it('routes outgoing mail to the kiqr-mailpit SMTP catcher via phpmailer_init', () => {
+    const content = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
+    expect(content).toContain("add_action('phpmailer_init'");
+    expect(content).toContain('$phpmailer->isSMTP()');
+    expect(content).toContain("$phpmailer->Host = 'kiqr-mailpit'");
+    expect(content).toContain('$phpmailer->Port = 1025');
+    expect(content).toContain('$phpmailer->SMTPAuth = false');
   });
 
   it('is deterministic across writes', () => {
