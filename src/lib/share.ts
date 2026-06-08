@@ -21,8 +21,7 @@ export const SHARE_URL_CONTAINER_PATH = '/tmp/kiqr-share-url';
 export function resolveProjectContainerId(
   projectId: string,
   service: string,
-  exec: (cmd: string) => string = (cmd) =>
-    execSync(cmd, {stdio: 'pipe'}).toString(),
+  exec: (cmd: string) => string = (cmd) => execSync(cmd, {stdio: 'pipe'}).toString(),
 ): string | null {
   try {
     const out = exec(
@@ -126,13 +125,13 @@ export function writeShareUrlToContainer(
   }
   const id = resolveProjectContainerId(projectId, 'wordpress');
   if (!id) {
-    onError?.(new Error(`Could not resolve WordPress container for project ${projectId}`));
+    onError?.(
+      new Error(`Could not resolve WordPress container for project ${projectId}`),
+    );
     return;
   }
   try {
-    exec(
-      `docker exec ${id} sh -c 'printf %s ${url} > ${SHARE_URL_CONTAINER_PATH}'`,
-    );
+    exec(`docker exec ${id} sh -c 'printf %s ${url} > ${SHARE_URL_CONTAINER_PATH}'`);
   } catch (err) {
     onError?.(err);
   }

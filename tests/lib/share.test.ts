@@ -150,7 +150,7 @@ describe('writeShareUrlToContainer', () => {
 });
 
 describe('clearShareUrlFromContainer', () => {
-  it('is a no-op when no matching container is running (doesn\'t throw)', () => {
+  it("is a no-op when no matching container is running (doesn't throw)", () => {
     // Same rationale as writeShareUrlToContainer: when the container is
     // already gone there is nothing to clean and we mustn't fail the
     // tunnel-exit path.
