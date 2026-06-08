@@ -5,6 +5,7 @@ import {useRef, useState} from 'react';
 import type {Step} from '../components/StepRunner.js';
 import StepRunner from '../components/StepRunner.js';
 import {ensureAgentRunning} from '../lib/agent.js';
+import {writeApacheConf} from '../lib/apache-conf.js';
 import {writeProjectCompose} from '../lib/compose.js';
 import {readLocalConfig, readProjectConfig, writeLocalConfig} from '../lib/config.js';
 import {
@@ -16,7 +17,6 @@ import {
 import {buildProjectHostname} from '../lib/hostname.js';
 import {validateWordPressPhp} from '../lib/image-tags.js';
 import {writeMuPlugin} from '../lib/mu-plugin.js';
-import {writeApacheConf} from '../lib/apache-conf.js';
 import {
   getProjectPluginsDir,
   getProjectRuntimeDir,

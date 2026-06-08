@@ -62,9 +62,7 @@ describe('generateAgentCompose', () => {
     const parsed = YAML.parse(yaml);
     const command = parsed.services.traefik.command as string[];
     expect(
-      command.some(
-        (c) => c === '--entrypoints.web.forwardedHeaders.insecure=true',
-      ),
+      command.some((c) => c === '--entrypoints.web.forwardedHeaders.insecure=true'),
     ).toBe(true);
   });
 

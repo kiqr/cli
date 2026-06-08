@@ -101,7 +101,7 @@ describe('writeMuPlugin', () => {
     // production concern; in dev we want pages to render wherever requested.
     const content = fs.readFileSync(writeMuPlugin(tmp), 'utf-8');
     expect(content).toContain("remove_filter('template_redirect', 'redirect_canonical')");
-    expect(content).toContain("WPSEO_Frontend");
+    expect(content).toContain('WPSEO_Frontend');
   });
 
   it('rewrites absolute production URLs in the response body to the current dynamic URL', () => {
