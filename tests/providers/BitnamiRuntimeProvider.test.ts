@@ -34,6 +34,31 @@ describe('BitnamiRuntimeProvider', () => {
     expect(env['WORDPRESS_DB_NAME']).toBe('wordpress');
   });
 
+  it('derives dynamic URLs from X-Forwarded-Host with an HTTP_HOST fallback', () => {
+    const env = provider.getEnvironmentVariables({
+      dbName: 'wordpress',
+      dbUser: 'wordpress',
+      dbPassword: 'wordpress_password',
+    });
+    const extra = env['WORDPRESS_CONFIG_EXTRA']!;
+
+    // Prefers the public host forwarded by the tunnel, then falls back to the
+    // local Host header for normal requests (unchanged local behavior).
+    expect(extra).toContain("$$_SERVER['HTTP_X_FORWARDED_HOST']");
+    expect(extra).toContain("$$_SERVER['HTTP_HOST']");
+    // Honors the forwarded scheme so tunneled (https) requests generate https
+    // URLs, defaulting to http locally.
+    expect(extra).toContain("$$_SERVER['HTTP_X_FORWARDED_PROTO']");
+    expect(extra).toContain("=== 'https'");
+    // Still defines both URL constants and keeps the kiqr dev flag.
+    expect(extra).toContain("define('WP_HOME'");
+    expect(extra).toContain("define('WP_SITEURL'");
+    expect(extra).toContain("define('KIQR_DEVELOPMENT', true)");
+    // PHP `$` must stay escaped as `$$` so docker-compose unescapes it; there
+    // must be no lone `$` (a single, unescaped sigil) anywhere in the string.
+    expect(extra).not.toMatch(/(^|[^$])\$([^$]|$)/);
+  });
+
   it('returns compose services with correct version', () => {
     const services = provider.generateComposeServices({
       projectSlug: 'my-theme',
