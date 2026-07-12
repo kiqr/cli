@@ -10,7 +10,7 @@ Kiqr is the deal: you stay in your theme repo, run one command, and a real WordP
 cd my-glorious-theme
 kiqr up
 # ☕ ...a few seconds later...
-# → http://my-glorious-theme.your-laptop.lvh.me:5477
+# → http://my-glorious-theme.lvh.me:5477
 ```
 
 That's the whole pitch. Keep reading and we'll prove it.
@@ -75,9 +75,10 @@ kiqr up
 
 First run in a fresh theme? Kiqr notices there's no project config yet, recognizes your theme, and offers to set everything up — no `init` ceremony required. When it's done you get:
 
-- 🌐 your site at `http://<theme>.<your-computer>.lvh.me:5477`
+- 🌐 your site at `http://<theme>.lvh.me:5477`
 - 🔐 a one-click auto-login to `/wp-admin`
 - 🗄️ phpMyAdmin, also one click
+- 📬 every email your site sends, caught in an inbox — `kiqr open mail`
 - 💾 a database and uploads folder that survive restarts
 
 Edit a file, hit refresh (or run `kiqr watch` and don't even do that). Welcome to the good life.
@@ -119,9 +120,27 @@ Everything below is a real, shipped command. Run `kiqr <command> --help` any tim
 | `kiqr open` | Your site |
 | `kiqr open admin` | `/wp-admin`, auto-logged-in (no password tango) |
 | `kiqr open phpmyadmin` | phpMyAdmin, auto-logged-in |
+| `kiqr open mail` | The Mailpit inbox — every email your site tried to send |
 | `kiqr open plugins` | The local plugins folder |
 | `kiqr open uploads` | The local uploads folder |
 | `kiqr open data` | The project's local data directory |
+
+### 📬 Catch every email (Mailpit)
+
+WordPress sends a *lot* of mail — password resets, order receipts, form
+notifications — and in local dev it usually vanishes into the void (or worse,
+fires off to a real customer). Kiqr catches all of it.
+
+The kiqr agent runs [Mailpit](https://mailpit.axllent.org), and every message
+any project tries to send lands in a clean web inbox — zero SMTP config, no
+plugin to install:
+
+```bash
+kiqr open mail        # → http://mail.lvh.me:5477
+```
+
+It just works the moment your site is up, and it's **development-only** — your
+deployed site keeps using its real mailer, untouched.
 
 ### 🗄️ Database backups (`kiqr db`)
 
@@ -173,7 +192,7 @@ The shared reverse proxy + splash page that route every Kiqr site live as one pe
 | `kiqr agent restart` | Restart it. |
 | `kiqr agent logs` | Stream its logs. |
 
-`kiqr down` and `kiqr destroy` leave the agent alone on purpose — it's infrastructure, not project clutter. (It's also where future shared goodies will live: a dashboard, a mail catcher, the collaboration tunnel.)
+`kiqr down` and `kiqr destroy` leave the agent alone on purpose — it's infrastructure, not project clutter. It already hosts the [Mailpit](https://mailpit.axllent.org) email catcher (`kiqr open mail`), with more shared goodies like a dashboard on the roadmap.
 
 ### 🧹 Setup & housekeeping
 
